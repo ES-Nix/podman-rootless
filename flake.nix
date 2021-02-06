@@ -12,10 +12,17 @@
          };
 
 
-        myScript =  pkgsAllowUnfree.writeShellScriptBin "compleInstallPodman" ''
+        myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
           #!${nixpkgs.legacyPackages.${system}.stdenv.shell}
           echo 'The wrapper WWW!'
+          NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
+          NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
 
+          sudo setcap cap_setuid+ep "$NEWUIDMAP"
+          sudo setcap cap_setgid+ep "$NEWGIDMAP"
+
+          sudo chmod -s "$NEWUIDMAP"
+          sudo chmod -s "$NEWGIDMAP"
 
        '';
 
@@ -83,6 +90,7 @@
         shellHook = ''
            echo "The hook"
            podman-setup
+           extraPodman
          '';
 
         };
