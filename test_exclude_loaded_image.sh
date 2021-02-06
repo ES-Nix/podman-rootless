@@ -30,6 +30,11 @@ set -eux pipefail
 #sh -c 'apk add --no-cache curl && curl google.com'
 
 
+curl -fsSL https://get.docker.com | sudo sh \
+&& sudo usermod --append --groups docker "$USER" \
+&& docker --version \
+&& sudo reboot
+
 docker pull alpine:3.13.0
 
 
@@ -39,7 +44,7 @@ podman images
 docker save alpine:3.13.0 --output=oci_apine3_13_0
 
 
-stat file oci_apine3_13_0 | grep tar
+stat oci_apine3_13_0
 # this file command is from the QEMU VM, be carefull.
 file oci_apine3_13_0 | grep tar
 
