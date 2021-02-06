@@ -52,3 +52,7 @@ podman images
 nix build github:ES-Nix/poetry2nix-examples/424f84dbc089f448a7400292f78b903e44c7f074#poetry2nixOCIImage
 file result
 file --dereference result
+
+podman load < result
+
+podman images

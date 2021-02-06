@@ -14,7 +14,14 @@
 
         myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
           #!${nixpkgs.legacyPackages.${system}.stdenv.shell}
-          echo 'The wrapper WWW!'
+          
+          # TODO: add a conditional here to run this mesage only when 
+          # needs a sudo call, i mean, only the first time problably.
+          # No call for sudo is neede after de first time (in most cases)
+          # We should check for the actual capabilitie and if they are 
+          # the ones that podman needs skip the sudo calls.
+
+          #echo 'Fixing capabilities. It requires sudo, sorry!'
           NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
           NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
 
@@ -88,7 +95,7 @@
                                          cleanPodmanSetup
                           ];
         shellHook = ''
-           echo "The hook"
+           #echo "Entering the nix devShell"
            podman-setup
            extraPodman
          '';
