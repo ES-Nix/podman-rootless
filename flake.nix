@@ -68,6 +68,18 @@
    
   '';
 
+  # TODO: it does not work
+  testsPodmanInstall = pkgsAllowUnfree.writeShellScriptBin "tests-podman-install" ''
+    #!${pkgsAllowUnfree.runtimeShell}
+      
+
+     touch $out
+     cp ${./tests.sh} $out/${./tests.sh}
+     .$out/tests.sh
+
+  '';
+
+
       in
       {
 
@@ -93,6 +105,7 @@
                                          myScript
                                          podmanSetupScript
                                          cleanPodmanSetup
+                                         testsPodmanInstall
                           ];
         shellHook = ''
            #echo "Entering the nix devShell"
