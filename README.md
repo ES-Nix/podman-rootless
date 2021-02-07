@@ -7,6 +7,17 @@ nix flake clone github:ES-Nix/podman-rootless --dest podman-rootless
 
 nix develop github:ES-Nix/podman-rootless/324855d116d15a0b54f33c9489cf7c5e6d9cd714 --command ./install-podman.sh && ./test_podman-rootless.sh
 
+nix develop github:ES-Nix/podman-rootless/bffe8ae0d5b933b321e9fc0de25d992f5f5540d0
+
+
+## Install via git
+
+```
+git clone https://github.com/ES-Nix/podman-rootless.git
+cd podman-rootless
+git checkout bffe8ae0d5b933b321e9fc0de25d992f5f5540d0
+nix develop
+```
 
 
 
@@ -19,15 +30,4 @@ podman run \
 --workdir /code \
 --volume "$(pwd)":/code \
 "$IMAGE_VERSION" bash -c "sudo ls -al && id"
-
-
-
-podman ps --all --quiet | xargs --no-run-if-empty podman stop \
-&& podman ps --all --quiet | xargs --no-run-if-empty podman rm --force\
-&& podman images --quiet | xargs --no-run-if-empty podman rmi --force \
-&& podman container prune --force \
-&& podman images --quiet | podman image prune --force \
-&& podman network ls --quiet | xargs --no-run-if-empty podman network rm \
-&& podman volume ls --quiet | xargs --no-run-if-empty podman volume prune
-
    
