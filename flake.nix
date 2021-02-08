@@ -89,17 +89,15 @@
 
       in
       {
-
         # For FREE packages use:
         #packages.podman = import ./podman.nix {
         #    pkgs = nixpkgs.legacyPackages.${system};
         #};
 
-        #packages.podman = import ./podman.nix {
-        #  pkgs = pkgsAllowUnfree;
-        #};
-
-        #defaultPackage = self.packages.${system}.podman;
+        packages.mypodman = import ./podman.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+        };
+        defaultPackage = self.packages.${system}.mypodman;
 
         devShell = pkgsAllowUnfree.mkShell {
           buildInputs = with pkgsAllowUnfree; [
@@ -111,14 +109,18 @@
             podmanCapabilities
             podmanSetupScript # config files in here
             podmanClearConfigFiles
-            #testsPodmanInstall
+            #testsPodmanInstall # not working
             podmanClearItsData
             dockerCompat
+            #mypodman.defaultPackage.${system}
+            self.defaultPackage.${system}
           ];
           shellHook = ''
             #echo "Entering the nix devShell"
             podman-setup
             podman-capabilities
+            test_script
+            compleInstallPodman
           '';
 
         };
