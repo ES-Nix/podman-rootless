@@ -42,6 +42,6 @@ pkgs.stdenv.mkDerivation {
     install -t $out/bin ${myScript}/bin/compleInstallPodman
     '';
 
-  phases = [ "buildPhase" "installPhase" "fixupPhase" ];
+  phases = [ "installPhase" "fixupPhase" ];
 
 }

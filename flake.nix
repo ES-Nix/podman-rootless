@@ -94,11 +94,12 @@
         #    pkgs = nixpkgs.legacyPackages.${system};
         #};
 
-        packages.mypodman = import ./podman.nix {
+        #packages.mypodman = import ./podman.nix {
+        #  pkgs = nixpkgs.legacyPackages.${system};
+        #};
+        defaultPackage = import ./podman.nix {
           pkgs = nixpkgs.legacyPackages.${system};
         };
-        defaultPackage = self.packages.${system}.mypodman;
-
         devShell = pkgsAllowUnfree.mkShell {
           buildInputs = with pkgsAllowUnfree; [
             conmon
