@@ -1,11 +1,5 @@
 {pkgs ? import <nixpkgs> { } }:
 let
-
-  myScript = pkgs.writeShellScriptBin "completInstallPodman" ''
-    #!${pkgs.stdenv.shell}
-    echo 'The wrapper!'
-  '';
-
         podmanCapabilities = pkgs.writeShellScriptBin "podman-capabilities" ''
           #!${pkgs.runtimeShell}
 

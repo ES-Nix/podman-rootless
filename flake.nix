@@ -35,7 +35,6 @@
             #echo "Entering the nix devShell"
             podman-setup-script
             podman-capabilities
-            completInstallPodman
           '';
         };
       });
