@@ -79,6 +79,10 @@ pkgs.stdenv.mkDerivation {
     slirp4netns
     dockerPodmanCompat
   ];
+
+  # TODO: What is the correct way to do this:
+  # https://github.com/NixOS/nixpkgs/issues/23099#issue-209660108
+  #
   #src = builtins.filterSource (path: type: false) ./.;
   #unpackPhase = "true";
   #src = self;

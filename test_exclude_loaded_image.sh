@@ -6,30 +6,6 @@
 set -eux pipefail
 
 
-#podman \
-#run \
-#--interactive \
-#--rm \
-#--runtime $(which runc) \
-#--signature-policy policy.json \
-#--tty \
-#docker.io/tianon/toybox \
-#sh -c id
-
-
-#podman \
-#run \
-#--interactive \
-#--net=host \
-#--rm \
-#--signature-policy policy.json \
-#--tty \
-#--workdir /code \
-#--volume "$(pwd)":/code \
-#docker.io/library/alpine:3.13.0 \
-#sh -c 'apk add --no-cache curl && curl google.com'
-
-
 curl -fsSL https://get.docker.com | sudo sh \
 && sudo usermod --append --groups docker "$USER" \
 && docker --version \
@@ -52,8 +28,6 @@ file oci_apine3_13_0 | grep tar
 podman load < oci_apine3_13_0
 podman images
 
-
-
 nix build github:ES-Nix/poetry2nix-examples/424f84dbc089f448a7400292f78b903e44c7f074#poetry2nixOCIImage
 file result
 file --dereference result
@@ -61,3 +35,12 @@ file --dereference result
 podman load < result
 
 podman images
+
+# TODO: publish ports
+podman \
+run \
+--interactive \
+--rm \
+--tty \
+localhost/numtild-dockertools-poetry2nix:0.0.1 \
+nixfriday

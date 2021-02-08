@@ -9,8 +9,6 @@ podman \
 run \
 --interactive \
 --rm \
---runtime $(which runc) \
---signature-policy policy.json \
 --tty \
 docker.io/tianon/toybox \
 sh -c id
@@ -19,9 +17,6 @@ sh -c id
 podman \
 run \
 --interactive \
---net=host \
---rm \
---signature-policy policy.json \
 --tty \
 --workdir /code \
 --volume "$(pwd)":/code \

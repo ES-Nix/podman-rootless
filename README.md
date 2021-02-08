@@ -25,9 +25,50 @@ IMAGE_VERSION='localhost/nix-oci-dockertools:0.0.1'
 
 podman run \
 --interactive \
---tty \
---rm \
+--rm=true \
+--tty=true \
 --workdir /code \
 --volume "$(pwd)":/code \
 "$IMAGE_VERSION" bash -c "sudo ls -al && id"
-   
+ 
+
+Other somewhat hard tests:
+
+```
+podman \
+run \
+--interactive \
+--rm=true \
+--tty=true \
+python:3.8 \
+bash
+```
+
+```  
+podman \
+run \
+--interactive \
+--rm=true \
+--tty=true \
+blang/latex \
+bash
+```
+
+```  
+podman \
+run \
+--interactive \
+--rm=true \
+--tty=true \
+wernight/funbox \
+nyancat
+```
+
+
+## Notes
+
+The behevior "the nix develop command which uses the devShell.${system} 
+flake output if it exists or defaultPackage.${system} otherwise.", [source](https://github.com/NixOS/nix/issues/2854#issuecomment-673923349), 
+is really important to understand the current working state.
+
+
