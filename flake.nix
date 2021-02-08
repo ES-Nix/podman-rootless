@@ -94,12 +94,14 @@
         #    pkgs = nixpkgs.legacyPackages.${system};
         #};
 
-        #packages.mypodman = import ./podman.nix {
-        #  pkgs = nixpkgs.legacyPackages.${system};
-        #};
+        packages.mypodman = import ./podman.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+        };
+
         defaultPackage = import ./podman.nix {
           pkgs = nixpkgs.legacyPackages.${system};
         };
+
         devShell = pkgsAllowUnfree.mkShell {
           buildInputs = with pkgsAllowUnfree; [
             conmon
@@ -115,6 +117,7 @@
             dockerCompat
             #mypodman.defaultPackage.${system}
             self.defaultPackage.${system}
+            self.packages.${system}.mypodman
           ];
           shellHook = ''
             #echo "Entering the nix devShell"
