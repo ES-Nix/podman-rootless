@@ -10,8 +10,11 @@ let
           # the ones that podman needs skip the sudo calls.
 
           #echo 'Fixing capabilities. It requires sudo, sorry!'
-          NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
-          NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
+          #NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
+          #NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
+
+          NEWUIDMAP=$(which newuidmap)
+          NEWGIDMAP=$(which newgidmap)
 
           sudo setcap cap_setuid+ep "$NEWUIDMAP"
           sudo setcap cap_setgid+ep "$NEWGIDMAP"
