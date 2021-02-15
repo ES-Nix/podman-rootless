@@ -36,11 +36,21 @@ podman load < result
 
 podman images
 
-# TODO: publish ports
+# TODO: publish ports, test it!
 podman \
 run \
 --interactive \
+--publish=5000:5000 \
 --rm \
 --tty \
 localhost/numtild-dockertools-poetry2nix:0.0.1 \
+nixfriday
+
+docker \
+run \
+--interactive \
+--publish=5000:5000 \
+--rm \
+--tty \
+numtild-dockertools-poetry2nix:0.0.1 \
 nixfriday

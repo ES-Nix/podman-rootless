@@ -67,7 +67,7 @@ nyancat
 
 ## Notes
 
-The behevior "the nix develop command which uses the devShell.${system} 
+The behavior "the nix develop command which uses the devShell.${system} 
 flake output if it exists or defaultPackage.${system} otherwise.", [source](https://github.com/NixOS/nix/issues/2854#issuecomment-673923349), 
 is really important to understand the current working state.
 
