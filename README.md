@@ -81,3 +81,19 @@ nix build \
 && result/fsh-podman-rootless-env podman --help
 ```
 
+### Troubleshooting
+
+```
+stat $(which newuidmap)
+stat $(which newgidmap)
+```
+
+cat /proc/self/uid_map
+podman unshare cat /proc/self/uid_map
+
+whereis newuidmap 
+whereis newgidmap
+
+rm -rf ~/.config/containers ~/.local/share/containers
+
+
