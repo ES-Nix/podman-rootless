@@ -96,6 +96,7 @@ whereis newgidmap
 
 rm -rf ~/.config/containers ~/.local/share/containers
 
+Use the `--log-level=debug`, really usefull!
 
 ## Credits and history
 
