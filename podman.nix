@@ -26,7 +26,7 @@ let
 
     multiPkgs = pkgs: with pkgs;
       [ zlib ];
-    runScript = "bash";
+    runScript = "${pkgs.podman}/bin/podman";
   };
 
   scriptExample = pkgs.writeShellScriptBin "script-example" ''
