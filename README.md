@@ -97,3 +97,22 @@ whereis newgidmap
 rm -rf ~/.config/containers ~/.local/share/containers
 
 
+## Credits and history
+
+TODO: improve it, i am busy trying to make it work first.
+
+- While searching for some problem that i was facing i have found 
+  [this issue comment](https://github.com/NixOS/nixpkgs/issues/65202#issuecomment-558775869) from
+  [adisbladis](https://github.com/adisbladis), it was pointing to 
+  [a gist that he have done](https://gist.github.com/adisbladis/187204cb772800489ee3dac4acdd9947). I didn't
+  test it in [NixOS](https://gist.github.com/adisbladis/187204cb772800489ee3dac4acdd9947), but was able 
+  to use the `nix-shell` (it was intended to be used as `nix-shell`) and tranform it in a flake and do
+  some crazy stuff to combine it in other flakes take a look at the 
+  [example of nix, flakes, shellHook, writeShellScriptBin, defaultPackage, all together](https://github.com/ES-Nix/nix-flakes-shellHook-writeShellScriptBin-defaultPackage)
+  that uses what i did in this rev [170f002d76070b1d281cf7e6868076bcfb1fea07](https://github.com/ES-Nix/podman-rootless/tree/170f002d76070b1d281cf7e6868076bcfb1fea07).
+  But a faced a problem, the file system, yes, even this kind of stuff to make things break. Podman was working really ok,
+  but when i tried to load a "big" [OCI image](https://github.com/opencontainers/image-spec) with size > 0.5Gbyte it broke.
+  The podman mantainers say "[We recommend using fuse-overlayfs instead, as it is capable of deduplicating storage.](https://github.com/containers/podman/issues/3846#issuecomment-522332015)"
+  So now i am trying to use [buildFHSUserEnv](https://gsc.io/70266391-48a6-49be-ab5d-acb5d7f17e76-nixpkgs/doc/nixpkgs-manual/html/sec-fhs-environments.html)
+  to solve it adapting the [danieldk commented](https://github.com/NixOS/nixpkgs/issues/65202#issuecomment-593103989).
+- TODO  
