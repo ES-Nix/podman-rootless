@@ -114,6 +114,6 @@ TODO: improve it, i am busy trying to make it work first.
   But a faced a problem, the file system, yes, even this kind of stuff to make things break. Podman was working really ok,
   but when i tried to load a "big" [OCI image](https://github.com/opencontainers/image-spec) with size > 0.5Gbyte it broke.
   The podman mantainers say "[We recommend using fuse-overlayfs instead, as it is capable of deduplicating storage.](https://github.com/containers/podman/issues/3846#issuecomment-522332015)"
-  So now i am trying to use [buildFHSUserEnv](https://gsc.io/70266391-48a6-49be-ab5d-acb5d7f17e76-nixpkgs/doc/nixpkgs-manual/html/sec-fhs-environments.html)
+  So now i am trying to use [buildFHSUserEnv](https://gsc.io/70266391-48a6-49be-ab5d-acb5d7f17e76-nixpkgs/doc/nixpkgs-manual/html/sec-fhs-environments.html), definition in nixpokgs [buildFHSUserEnv](https://github.com/NixOS/nixpkgs/blob/cb6d8368a3f6484c1c7f27475b8b4ebe0275dc1a/pkgs/build-support/build-fhs-userenv/default.nix)
   to solve it adapting the [danieldk commented](https://github.com/NixOS/nixpkgs/issues/65202#issuecomment-593103989).
 - TODO  

@@ -6,10 +6,10 @@
 set -eux pipefail
 
 
-curl -fsSL https://get.docker.com | sudo sh \
-&& sudo usermod --append --groups docker "$USER" \
-&& docker --version \
-&& sudo reboot
+#curl -fsSL https://get.docker.com | sudo sh \
+#&& sudo usermod --append --groups docker "$USER" \
+#&& docker --version \
+#&& sudo reboot
 
 docker pull alpine:3.13.0
 
@@ -21,7 +21,7 @@ docker save alpine:3.13.0 --output=oci_apine3_13_0
 
 
 stat oci_apine3_13_0
-# this file command is from the QEMU VM, be carefull.
+# The file command may not be in the inveronment.
 file oci_apine3_13_0 | grep tar
 
 
@@ -54,3 +54,6 @@ run \
 --tty \
 numtild-dockertools-poetry2nix:0.0.1 \
 nixfriday
+
+rm --force --verbose oci_apine3_13_0
+
