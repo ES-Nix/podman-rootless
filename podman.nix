@@ -19,7 +19,8 @@ let
       dbus
       hello 
       scriptExample
-     
+      unixtools.whereis 
+      which
       ];
 
 
