@@ -72,3 +72,12 @@ flake output if it exists or defaultPackage.${system} otherwise.", [source](http
 is really important to understand the current working state.
 
 
+## 
+
+
+
+```
+nix build \
+&& result/fsh-podman-rootless-env podman --help
+```
+

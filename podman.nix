@@ -1,123 +1,74 @@
-{pkgs ? import <nixpkgs> { } }:
-let
-        podmanCapabilities = pkgs.writeShellScriptBin "podman-capabilities" ''
-          #!${pkgs.runtimeShell}
+{ pkgs ? import <nixpkgs> {} }:
 
-          # TODO: add a conditional here to run this message only when
-          # needs a sudo call, i mean, only the first time problably.
-          # No call for sudo is neede after de first time (in most cases)
-          # We should check for the actual capabilitie and if they are
-          # the ones that podman needs skip the sudo calls.
+let 
 
-          #echo 'Fixing capabilities. It requires sudo, sorry!'
-          #NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
-          #NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
+  fhs = pkgs.buildFHSUserEnv {
+    name = "fsh-podman-rootless-env";
+    targetPkgs = pkgs: with pkgs;
+      [ 
+      conmon
+      etcFiles
+      fuse-overlayfs
+      file
+      podman
+      libcap
+      runc
+      skopeo
+      slirp4netns
+      shadow
+      dbus
+      hello 
+      scriptExample
+     
+      ];
 
-          NEWUIDMAP=$(which newuidmap)
-          NEWGIDMAP=$(which newgidmap)
 
-          sudo setcap cap_setuid+ep "$NEWUIDMAP"
-          sudo setcap cap_setgid+ep "$NEWGIDMAP"
+    multiPkgs = pkgs: with pkgs;
+      [ zlib ];
+    runScript = "bash";
+  };
 
-          sudo chmod -s "$NEWUIDMAP"
-          sudo chmod -s "$NEWGIDMAP"
-        '';
+  scriptExample = pkgs.writeShellScriptBin "script-example" ''
+    #!${pkgs.runtimeShell}
+ 
+      echo 'A bash script example!'
+  '';
+ 
+  registriesConf = pkgs.writeText "registries.conf" ''
+    [registries.search]
+    registries = ['docker.io']
+    [registries.block]
+    registries = []
+  '';
+  etcFiles = pkgs.runCommandNoCC "setup-etc" {} ''
+    mkdir -p $out/etc/containers 
+    ln -s ${pkgs.skopeo.src}/default-policy.json \
+     $out/etc/containers/policy.json
+    ln -s ${registriesConf} $out/etc/containers/registries.conf
+    ln -s /host/etc/subuid $out/etc/subuid
+    ln -s /host/etc/subgid $out/etc/subgid
+  '';
 
-        # Provides a script that copies required files to ~/
-        podmanSetupScript =
-          let
-            registriesConf = pkgs.writeText "registries.conf" ''
-              [registries.search]
-              registries = ['docker.io']
-              [registries.block]
-              registries = []
-            '';
-          in
-          pkgs.writeShellScriptBin "podman-setup-script" ''
-            #!${pkgs.runtimeShell}
-            # Dont overwrite customised configuration
-            if ! test -f ~/.config/containers/policy.json; then
-              install -Dm555 ${pkgs.skopeo.src}/default-policy.json ~/.config/containers/policy.json
-            fi
-            if ! test -f ~/.config/containers/registries.conf; then
-              install -Dm555 ${registriesConf} ~/.config/containers/registries.conf
-            fi
-          '';
 
-        # Provides a fake "docker" binary mapping to podman
-        dockerPodmanCompat = pkgs.runCommandNoCC "docker-podman-compat" { } ''
-          mkdir --parent $out/bin
-          ln --symbolic ${pkgs.podman}/bin/podman $out/bin/docker
-        '';
+in pkgs.stdenv.mkDerivation {
+  name = "fhs-env-derivation";
 
-        podmanClearConfigFiles = pkgs.writeShellScriptBin "podman-clear-config-files" ''
-          #!${pkgs.runtimeShell}
+  src = ./.;
 
-           rm --force --verbose ~/.config/containers/policy.json
-           rm --force --verbose ~/.config/containers/registries.conf
-        '';
-
-        podmanClearItsData = pkgs.writeShellScriptBin "podman-clear-its-data" ''
-          #!${pkgs.runtimeShell}
-
-          # TODO: it need tests!
-          podman ps --all --quiet | xargs --no-run-if-empty podman stop \
-          && podman ps --all --quiet | xargs --no-run-if-empty podman rm --force\
-          && podman images --quiet | xargs --no-run-if-empty podman rmi --force \
-          && podman container prune --force \
-          && podman images --quiet | podman image prune --force \
-          && podman network ls --quiet | xargs --no-run-if-empty podman network rm \
-          && podman volume ls --quiet | xargs --no-run-if-empty podman volume prune
-        '';
-
-in
-pkgs.stdenv.mkDerivation {
-  name = "test-derivation";
-  buildInputs = with pkgs; [
-    conmon
-    podman
-    runc
-    shadow
-    slirp4netns
-    dockerPodmanCompat
-  ];
-
-  # TODO: What is the correct way to do this:
-  # https://github.com/NixOS/nixpkgs/issues/23099#issue-209660108
-  #
-  #src = builtins.filterSource (path: type: false) ./.;
-  #unpackPhase = "true";
-  #src = self;
-#  buildPhase = ''
-#    mkdir --parent $out
-#    cp -arv ${pkgs.conmon}/bin/conmon $out/conmon
-#    cp -arv ${pkgs.runc}/bin/runc $out/runc
-#    cp -arv ${pkgs.shadow}/bin/newuidmap $out/newuidmap
-#    cp -arv ${pkgs.shadow}/bin/newgidmap $out/newgidmap
-#    cp -arv ${pkgs.slirp4netns}/bin/slirp4netns $out/slirp4netns
-#
-#    cp -arv ${myScript} $out/myScript
-#
-#  '';
-
-  #buildPhase = dockerPodmanCompat;
-
+  nativeBuildInputs = [ fhs scriptExample ];
+  buildInputs = [ etcFiles ];
   installPhase = ''
-    mkdir --parent $out/bin;
-    install -t $out/bin ${pkgs.podman}/bin/podman
-    install -t $out/bin ${pkgs.conmon}/bin/conmon
-    install -t $out/bin ${pkgs.runc}/bin/runc
-    install -t $out/bin ${pkgs.shadow}/bin/newuidmap
-    install -t $out/bin ${pkgs.shadow}/bin/newgidmap
-    install -t $out/bin ${pkgs.slirp4netns}/bin/slirp4netns
+    mkdir --parent $out
+    ln -sf ${fhs}/bin/fsh-podman-rootless-env $out/fsh-podman-rootless-env
+    
+    ln -sf ${scriptExample}/bin/script-example $out/script-example
+    ln -sf ${etcFiles}/bin/setup-etc $out/setup-etc
+  '';
 
-    install -t $out/bin ${podmanCapabilities}/bin/podman-capabilities
-    install -t $out/bin ${podmanSetupScript}/bin/podman-setup-script
-    install -t $out/bin ${podmanClearConfigFiles}/bin/podman-clear-config-files
-    install -t $out/bin ${podmanClearItsData}/bin/podman-clear-its-data
+  shellHook = ''    
+    exec ${fhs}/bin/fsh-podman-rootless-env
+  '';
 
-    '';
-
-  phases = [ "buildPhase" "installPhase" "fixupPhase" ];
-
+  phases = [ "installPhase" "fixupPhase"];
 }
+
