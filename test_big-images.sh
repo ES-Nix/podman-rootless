@@ -5,10 +5,42 @@
 set -eux pipefail
 
 
+# This image is > 850MB
 podman \
 run \
 --interactive \
+--network host \
 --rm \
 --tty \
-docker.io/blang/latex \
+python:3.9 \
+bash -c 'python --version'
+
+# This image is > 2.5Gbytes
+podman \
+run \
+--interactive \
+--network host \
+--rm \
+--tty \
+jupyter/scipy-notebook \
+bash -c 'python --version'
+
+# This image is > 4Gbytes
+podman \
+run \
+--interactive \
+--network host \
+--rm \
+--tty \
+jupyter/datascience-notebook:r-4.0.3 \
+bash -c 'python --version'
+
+# This image is > 4Gbytes
+podman \
+run \
+--interactive \
+--network host \
+--rm \
+--tty \
+blang/latex \
 bash -c 'pdflatex --version'

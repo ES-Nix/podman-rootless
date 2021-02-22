@@ -21,7 +21,7 @@ docker save alpine:3.13.0 --output=oci_apine3_13_0
 
 
 stat oci_apine3_13_0
-# The file command may not be in the inveronment.
+# Note: The file command may not be in the environment.
 file oci_apine3_13_0 | grep tar
 
 
@@ -36,24 +36,26 @@ podman load < result
 
 podman images
 
-# TODO: publish ports, test it!
-podman \
-run \
---interactive \
---publish=5000:5000 \
---rm \
---tty \
-localhost/numtild-dockertools-poetry2nix:0.0.1 \
-nixfriday
-
-docker \
-run \
---interactive \
---publish=5000:5000 \
---rm \
---tty \
-numtild-dockertools-poetry2nix:0.0.1 \
-nixfriday
+## TODO: publish ports, test it!
+#podman \
+#run \
+#--interactive \
+#--network host \
+#--publish=5000:5000 \
+#--rm \
+#--tty \
+#localhost/numtild-dockertools-poetry2nix:0.0.1 \
+#nixfriday
+#
+#docker \
+#run \
+#--interactive \
+#--network host \
+#--publish=5000:5000 \
+#--rm \
+#--tty \
+#numtild-dockertools-poetry2nix:0.0.1 \
+#nixfriday
 
 rm --force --verbose oci_apine3_13_0
 

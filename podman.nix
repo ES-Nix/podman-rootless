@@ -3,10 +3,14 @@
 let 
 
   fhs = pkgs.buildFHSUserEnv {
+    
     name = "fsh-podman-rootless-env";
+
     targetPkgs = pkgs: with pkgs;
       [ 
       conmon
+      cni
+      cni-plugins # https://github.com/containers/podman/issues/3679
       etcFiles
       fuse-overlayfs
       file
@@ -17,22 +21,28 @@ let
       slirp4netns
       shadow
       dbus
-      hello 
+      hello # just for tests
       scriptExample
       unixtools.whereis 
       which
       ];
 
-
-    multiPkgs = pkgs: with pkgs;
-      [ zlib ];
-    runScript = "${pkgs.podman}/bin/podman";
+    multiPkgs = pkgs: with pkgs; [ zlib ];
+    
+    #extraBuildCommands = ''
+    #  mkdir --parent $out/test-extraBuildCommands
+    #'';
+    
+    #extraInstallCommands = ''
+    #  mkdir --parent $out/etc/containers
+    #'';
+   
+    runScript = "bash";
   };
 
   scriptExample = pkgs.writeShellScriptBin "script-example" ''
     #!${pkgs.runtimeShell}
- 
-      echo 'A bash script example!'
+    echo 'A bash script example!'
   '';
  
   registriesConf = pkgs.writeText "registries.conf" ''
@@ -46,6 +56,7 @@ let
     ln -s ${pkgs.skopeo.src}/default-policy.json \
      $out/etc/containers/policy.json
     ln -s ${registriesConf} $out/etc/containers/registries.conf
+
     ln -s /host/etc/subuid $out/etc/subuid
     ln -s /host/etc/subgid $out/etc/subgid
   '';
@@ -54,22 +65,19 @@ let
 in pkgs.stdenv.mkDerivation {
   name = "fhs-env-derivation";
 
-  src = ./.;
+  # https://nix.dev/anti-patterns/language.html#reproducability-referencing-top-level-directory-with
+  src = builtins.path { path = ./.; };
 
   nativeBuildInputs = [ fhs scriptExample ];
   buildInputs = [ etcFiles ];
   installPhase = ''
     mkdir --parent $out
-    ln -sf ${fhs}/bin/fsh-podman-rootless-env $out/fsh-podman-rootless-env
-    
-    ln -sf ${scriptExample}/bin/script-example $out/script-example
-    ln -sf ${etcFiles}/bin/setup-etc $out/setup-etc
-  '';
+    ln --symbolic --force ${fhs}/bin/fsh-podman-rootless-env $out/fsh-podman-rootless-env
+    ln --symbolic --force ${etcFiles}/etc $out/etc
 
-  shellHook = ''    
-    exec ${fhs}/bin/fsh-podman-rootless-env
+    mkdir --parent $out/opt/cni/
+    ln --symbolic --force ${pkgs.cni-plugins} $out/opt/cni
   '';
-
   phases = [ "installPhase" "fixupPhase"];
 }
 
