@@ -11,3 +11,5 @@ set -eux pipefail
 ./test_exclude_loaded_image.sh
 ./test_podman-rootless.sh
 
+./test_owner-of-file-creation-on-volume.sh
+
