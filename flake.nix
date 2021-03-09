@@ -34,7 +34,7 @@
 
             ls -al ${self.packages.${system}.podman}/opt/cni
             mkdir --parent /opt/cni/bin/
-            ln --symbolic --force ${self.packages.${system}.podman}/opt/cni/bin /opt/cni/bin
+            #ln --symbolic --force ${self.packages.${system}.podman}/opt/cni/bin /opt/cni/bin
             exec ${self.packages.${system}.podman}/fsh-podman-rootless-env
             #script-exemple
           '';

@@ -52,13 +52,13 @@ let
     registries = []
   '';
   etcFiles = pkgs.runCommandNoCC "setup-etc" {} ''
-    mkdir -p $out/etc/containers 
-    ln -s ${pkgs.skopeo.src}/default-policy.json \
+    mkdir --parent $out/etc/containers
+    ln --symbolic ${pkgs.skopeo.src}/default-policy.json \
      $out/etc/containers/policy.json
-    ln -s ${registriesConf} $out/etc/containers/registries.conf
+    ln --symbolic ${registriesConf} $out/etc/containers/registries.conf
 
-    ln -s /host/etc/subuid $out/etc/subuid
-    ln -s /host/etc/subgid $out/etc/subgid
+    ln --symbolic /host/etc/subuid $out/etc/subuid
+    ln --symbolic /host/etc/subgid $out/etc/subgid
   '';
 
 
@@ -76,7 +76,10 @@ in pkgs.stdenv.mkDerivation {
     ln --symbolic --force ${etcFiles}/etc $out/etc
 
     mkdir --parent $out/opt/cni/
-    ln --symbolic --force ${pkgs.cni-plugins} $out/opt/cni
+    mkdir --parent $out/test/abc
+    ln --symbolic --force ${pkgs.cni-plugins}/bin/ $out/test/abc
+    ln --symbolic --force ${pkgs.cni-plugins}/bin/ $out/opt/cni/
+
   '';
   phases = [ "installPhase" "fixupPhase"];
 }
