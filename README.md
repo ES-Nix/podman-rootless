@@ -259,6 +259,8 @@ Explain about history in the beginning: [btrfs: The Best Filesystem You've Never
 [File Systems | Which One is the Best? ZFS, BTRFS, or EXT4](https://www.youtube.com/watch?v=HdEozE2gN9I)
 
 
+[All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications](https://www.usenix.org/conference/osdi14/technical-sessions/presentation/pillai)
+
 TODO: Try to make it work:   
 https://discourse.nixos.org/t/build-a-yocto-rootfs-inside-nix/2643/22
 
@@ -291,3 +293,21 @@ pedro \
 ```
 
 Why the `--login` gives problems? It somehow scruds with the terminal!
+
+0b4d0714bfaab2d3fd45176699658c1ae5437742
+
+
+```
+git clone https://github.com/ES-Nix/podman-rootless.git
+cd podman-rootless
+git checkout 0b4d0714bfaab2d3fd45176699658c1ae5437742
+nix develop
+```
+
+
+sudo \
+--preserve-env \
+su \
+--preserve-env \
+root \
+-c 'nix develop --ignore-environment github:ES-Nix/podman-rootless'
