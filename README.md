@@ -237,6 +237,9 @@ TODO: improve it, i am busy trying to make it work first.
 
 - Excelent: [On Nix, NixOS and the Filesystem Hierarchy Standard (FHS)](http://sandervanderburg.blogspot.com/2011/11/on-nix-nixos-and-filesystem-hierarchy.html)
 - Sander van der Burg is the creator of [buildFHSUserEnv](https://gsc.io/70266391-48a6-49be-ab5d-acb5d7f17e76-nixpkgs/doc/nixpkgs-manual/html/sec-fhs-environments.html), must read: [Composing FHS-compatible chroot environments with Nix (or deploying Steam in NixOS)](http://sandervanderburg.blogspot.com/2013/09/composing-fhs-compatible-chroot.html)
+- Podman official documentation: [Unsupported file systems in rootless mode](http://docs.podman.io/en/latest/markdown/podman.1.html#note-unsupported-file-systems-in-rootless-mode)
+- Maintainers in the podman repository ["we recommend using fuse-overlayfs"](https://github.com/containers/podman/issues/3846#issuecomment-522332015)
+- [Rootless Containers](https://rootlesscontaine.rs)
 
 - YouTube ExplainingComputers: [Explaining File Systems: NTFS, exFAT, FAT32, ext4 & More](https://www.youtube.com/watch?v=_h30HBYxtws)
 - YouTube Joe Collins: [Learning the Linux File System](https://www.youtube.com/watch?v=HIXzJ3Rz9po)
@@ -253,7 +256,7 @@ TODO: improve it, i am busy trying to make it work first.
 it looks like it is really old and [SSDs have changed it all](https://www.youtube.com/watch?v=eE7Bfw9lFfs&lc=UgwKswMApMLxMfVBK0V4AaABAg.8w0pXYZxjGI9-gxFP336ZB)
 [RAID 5 & RAID 6 - All You Need to Know as Fast As Possible](https://www.youtube.com/watch?v=1P8ZecG9iOI).
 
-Explain about history in the beginning: [btrfs: The Best Filesystem You've Never Heard Of](https://www.youtube.com/watch?v=-m01x3gHNjg)
+Explains about history in the beginning: [btrfs: The Best Filesystem You've Never Heard Of](https://www.youtube.com/watch?v=-m01x3gHNjg)
 [Deploying Btrfs at Facebook Scale - Josef Bacik, Facebook](https://www.youtube.com/watch?v=U7gXR2L05IU)
 
 [File Systems | Which One is the Best? ZFS, BTRFS, or EXT4](https://www.youtube.com/watch?v=HdEozE2gN9I)
@@ -270,7 +273,7 @@ and find an example of hardcoded path in the ELF and make from zero one working 
 
 
 
-## Runnig as root
+## Running as root
 
 
 
