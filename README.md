@@ -270,7 +270,8 @@ https://discourse.nixos.org/t/build-a-yocto-rootfs-inside-nix/2643/22
 TODO: Find the refs it cites [In-depth: ELF - The Extensible & Linkable Format](https://www.youtube.com/watch?v=nC1U1LJQL8o)
 and find an example of hardcoded path in the ELF and make from zero one working example.
 [2013 Day2P18 LoB: ELF Intro](https://www.youtube.com/watch?v=t09LFtfy4JU)
-
+[1 Handmade Linux x86 executables: ELF header](https://www.youtube.com/watch?v=XH6jDiKxod8) and 
+[2 Handmade Linux x86 executables: Hello, world](https://www.youtube.com/watch?v=F9roqf2oTVk).
 
 
 ## Running as root
