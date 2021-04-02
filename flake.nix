@@ -120,9 +120,11 @@
       IMAGE="$1"
       echo "$IMAGE"
 
-      if podman images | rg --quiet --case-sensitive --fixed-strings "$IMAGE"; then
+      if ! (( podman images | rg --quiet --case-sensitive --fixed-strings "$IMAGE")); then
         echo 'Creating image'
         podman-create-image
+      else
+        echo 'Using cached image'
       fi
     '';
 
@@ -170,6 +172,7 @@
 
         podman-create-if-not-existis "$IMAGE"
 
+        echo 'Entering in the alpine OCI image...'
         podman \
         run \
         --interactive=true \
@@ -217,8 +220,7 @@
            echo "Entering the nix devShell"
            podman-setup
            extraPodman
-           #apk-user
-
+           # apk-user
          '';
 
         };
