@@ -22,12 +22,7 @@ podman run \
 
 
 
-podman ps --all --quiet | xargs --no-run-if-empty podman stop \
-&& podman ps --all --quiet | xargs --no-run-if-empty podman rm --force\
-&& podman images --quiet | xargs --no-run-if-empty podman rmi --force \
-&& podman container prune --force \
-&& podman images --quiet | podman image prune --force \
-&& podman network ls --quiet | xargs --no-run-if-empty podman network rm \
-&& podman volume ls --quiet | xargs --no-run-if-empty podman volume prune
-
-   
+if ! ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
+#${pkgsAllowUnfree.libcap/bin/setcap} cap_setuid+ep $(readlink --canonicalize $(which newuidmap))
+#${pkgsAllowUnfree.libcap/bin/setcap} cap_setgid+ep $(readlink --canonicalize $(which newgidmap))
+fi
