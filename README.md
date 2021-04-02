@@ -22,7 +22,9 @@ podman run \
 
 
 
-if ! ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
-#${pkgsAllowUnfree.libcap/bin/setcap} cap_setuid+ep $(readlink --canonicalize $(which newuidmap))
-#${pkgsAllowUnfree.libcap/bin/setcap} cap_setgid+ep $(readlink --canonicalize $(which newgidmap))
+if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
+  setcap cap_setuid+ep "$NEWUIDMAP"
+  setcap cap_setgid+ep "$NEWGIDMAP"
 fi
+
+setcap cap_setuid+ep "$NEWUIDMAP"

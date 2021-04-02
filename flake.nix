@@ -168,6 +168,7 @@
           buildInputs = with pkgsAllowUnfree; [
                                      
                                          conmon
+                                         libcap
                                          podman
                                          ripgrep
                                          runc
