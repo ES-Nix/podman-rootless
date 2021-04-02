@@ -13,7 +13,7 @@
 
 
         myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
-          ${pkgsAllowUnfree.libcap}
+          echo ${pkgsAllowUnfree.libcap}
           echo $PATH
           # TODO: add a conditional here to run this mesage only when
           # needs a sudo call, i mean, only the first time problably.
@@ -33,8 +33,8 @@
           fi
 
           if ! ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
-            ${pkgsAllowUnfree.libcap}/bin/setcap cap_setuid+ep $(readlink --canonicalize $(which newuidmap))
-            ${pkgsAllowUnfree.libcap}/bin/setcap cap_setgid+ep $(readlink --canonicalize $(which newgidmap))
+            ${pkgsAllowUnfree.libcap/bin/setcap} cap_setuid+ep $(readlink --canonicalize $(which newuidmap))
+            ${pkgsAllowUnfree.libcap/bin/setcap} cap_setgid+ep $(readlink --canonicalize $(which newgidmap))
           fi
 
           #sudo chmod -s "$NEWUIDMAP"
