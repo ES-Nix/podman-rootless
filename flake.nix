@@ -13,7 +13,7 @@
 
 
         myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
-
+          # set -x
           # TODO: add a conditional here to run this mesage only when
           # needs a sudo call, i mean, only the first time problably.
           # No call for sudo is neede after de first time (in most cases)
@@ -32,8 +32,8 @@
           fi
 
           if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
-            setcap cap_setuid+ep "$NEWUIDMAP"
-            setcap cap_setgid+ep "$NEWGIDMAP"
+            sudo setcap cap_setuid+ep "$NEWUIDMAP"
+            sudo setcap cap_setgid+ep "$NEWGIDMAP"
           fi
 
        '';
