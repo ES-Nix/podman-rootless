@@ -13,7 +13,7 @@
 
 
         myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
-          # set -x
+          set -x
           # TODO: add a conditional here to run this mesage only when
           # needs a sudo call, i mean, only the first time problably.
           # No call for sudo is neede after de first time (in most cases)
@@ -32,10 +32,39 @@
           fi
 
           if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
+            echo 'Calling sudo to setcap of:' "$NEWUIDMAP"
             sudo setcap cap_setuid+ep "$NEWUIDMAP"
             sudo setcap cap_setgid+ep "$NEWGIDMAP"
           fi
 
+       '';
+
+        messCapabilities =  pkgsAllowUnfree.writeShellScriptBin "mess-capabilities" ''
+          set -x
+          # TODO: add a conditional here to run this mesage only when
+          # needs a sudo call, i mean, only the first time problably.
+          # No call for sudo is neede after de first time (in most cases)
+          # We should check for the actual capabilitie and if they are
+          # the ones that podman needs skip the sudo calls.
+
+          NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
+          NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
+
+          echo 'Fixing capabilities. It requires sudo, sorry!'
+          if ! command -v sudo &> /dev/null
+          then
+            echo 'Well, sudo is NOT in the PATH'
+            echo 'Printing the PATH:' "$PATH"
+            exit 1
+          fi
+
+          echo 'Running setcap -r'
+          sudo setcap -r "$NEWUIDMAP"
+          sudo setcap -r "$NEWGIDMAP"
+
+          echo 'Running getcap'
+          sudo getcap "$NEWUIDMAP"
+          sudo getcap "$NEWGIDMAP"
        '';
 
 
@@ -182,6 +211,7 @@
                                          podmanCreateImage
                                          podmanCreateIfNotExistis
                                          testsApkUser
+                                         messCapabilities
                           ];
         shellHook = ''
            echo "Entering the nix devShell"
