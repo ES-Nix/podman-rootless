@@ -28,3 +28,5 @@ if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setu
 fi
 
 setcap cap_setuid+ep "$NEWUIDMAP"
+
+cat $(which extraPodman)
