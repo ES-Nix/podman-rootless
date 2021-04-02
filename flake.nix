@@ -31,7 +31,7 @@
             exit 1
           fi
 
-          if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
+          if getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
             echo 'Calling sudo to setcap of:' "$NEWUIDMAP"
             sudo setcap cap_setuid+ep "$NEWUIDMAP"
             sudo setcap cap_setgid+ep "$NEWGIDMAP"
