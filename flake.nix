@@ -23,17 +23,19 @@
           NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
           NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
 
-          echo 'Fixing capabilities. It requires sudo, sorry!'
           if ! command -v sudo &> /dev/null
           then
+            echo 'Fixing capabilities. It requires sudo, sorry!'
             echo 'Well, sudo is NOT in the PATH'
             echo 'Printing the PATH:' "$PATH"
             exit 1
           fi
 
-          if ! (( getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' || getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' )); then
+          if ! (( getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' || getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setgid+ep' )); then
             echo 'Calling sudo to setcap of:' "$NEWUIDMAP"
             sudo setcap cap_setuid+ep "$NEWUIDMAP"
+
+            echo 'Calling sudo to setcap of:' "$NEWGIDMAP"
             sudo setcap cap_setgid+ep "$NEWGIDMAP"
           fi
 
@@ -58,7 +60,7 @@
             exit 1
           fi
 
-          echo 'Running setcap -r'
+          echo 'Running setcap -r' for:
           sudo setcap -r "$NEWUIDMAP"
           sudo setcap -r "$NEWGIDMAP"
 
@@ -220,7 +222,7 @@
            echo "Entering the nix devShell"
            podman-setup
            extraPodman
-           # apk-user
+           apk-user
          '';
 
         };
