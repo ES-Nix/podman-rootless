@@ -13,8 +13,9 @@
 
 
         myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
-
-          # TODO: add a conditional here to run this mesage only when 
+          ${pkgsAllowUnfree.libcap}
+          echo $PATH
+          # TODO: add a conditional here to run this mesage only when
           # needs a sudo call, i mean, only the first time problably.
           # No call for sudo is neede after de first time (in most cases)
           # We should check for the actual capabilitie and if they are 
@@ -31,9 +32,9 @@
             exit 1
           fi
 
-          if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
-              sudo setcap cap_setuid+ep "$NEWUIDMAP"
-              sudo setcap cap_setgid+ep "$NEWGIDMAP"
+          if ! ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && ${pkgsAllowUnfree.libcap}/bin/getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
+            ${pkgsAllowUnfree.libcap}/bin/setcap cap_setuid+ep $(readlink --canonicalize $(which newuidmap))
+            ${pkgsAllowUnfree.libcap}/bin/setcap cap_setgid+ep $(readlink --canonicalize $(which newgidmap))
           fi
 
           #sudo chmod -s "$NEWUIDMAP"
@@ -172,6 +173,7 @@
                                      
                                          conmon
                                          podman
+                                         ripgrep
                                          runc
                                          shadow
                                          slirp4netns                          
