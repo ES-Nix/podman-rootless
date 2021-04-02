@@ -31,10 +31,10 @@
             exit 1
           fi
 
-          ls ${nixpkgs}/pkgs
-
-          #sudo chmod -s "$NEWUIDMAP"
-          #sudo chmod -s "$NEWGIDMAP"
+          if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
+            setcap cap_setuid+ep "$NEWUIDMAP"
+            setcap cap_setgid+ep "$NEWGIDMAP"
+          fi
 
        '';
 
@@ -186,7 +186,7 @@
         shellHook = ''
            echo "Entering the nix devShell"
            podman-setup
-           #extraPodman
+           extraPodman
            #apk-user
 
          '';
