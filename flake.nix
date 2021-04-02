@@ -168,7 +168,7 @@
         BASE_IMAGE='docker.io/library/alpine':"$TAG"
         IMAGE='localhost/alpine-user-with-sudo':"$TAG"
 
-        podman-create-if-not-existis "$BASE_IMAGE"
+        podman-create-if-not-existis "$IMAGE"
 
         podman \
         run \
