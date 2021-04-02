@@ -13,23 +13,31 @@
 
 
         myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
-          #!${nixpkgs.legacyPackages.${system}.stdenv.shell}
-          
+
           # TODO: add a conditional here to run this mesage only when 
           # needs a sudo call, i mean, only the first time problably.
           # No call for sudo is neede after de first time (in most cases)
           # We should check for the actual capabilitie and if they are 
           # the ones that podman needs skip the sudo calls.
 
-          #echo 'Fixing capabilities. It requires sudo, sorry!'
           NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
           NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
 
-          sudo setcap cap_setuid+ep "$NEWUIDMAP"
-          sudo setcap cap_setgid+ep "$NEWGIDMAP"
+          echo 'Fixing capabilities. It requires sudo, sorry!'
+          if ! command -v sudo &> /dev/null
+          then
+            echo 'Well, sudo is NOT in the PATH'
+            echo 'Printing the PATH:' "$PATH"
+            exit 1
+          fi
 
-          sudo chmod -s "$NEWUIDMAP"
-          sudo chmod -s "$NEWGIDMAP"
+          if ! getcap "$NEWUIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' && getcap "$NEWGIDMAP" | rg --quiet --case-sensitive --fixed-strings 'cap_setuid=ep' ; then
+              sudo setcap cap_setuid+ep "$NEWUIDMAP"
+              sudo setcap cap_setgid+ep "$NEWGIDMAP"
+          fi
+
+          #sudo chmod -s "$NEWUIDMAP"
+          #sudo chmod -s "$NEWGIDMAP"
 
        '';
 
@@ -78,22 +86,73 @@
     && podman container prune --force \
     && podman images --quiet | podman image prune --force \
     && podman network ls --quiet | xargs --no-run-if-empty podman network rm \
-    && podman volume ls --quiet | xargs --no-run-if-empty podman volume prune
+    && podman volume prune --force
+    '';
+
+  podmanCreateIfNotExistis = pkgsAllowUnfree.writeShellScriptBin "podman-create-if-not-existis" ''
+    #!${pkgsAllowUnfree.runtimeShell}
+      IMAGE="$1"
+      echo "$IMAGE"
+
+      if podman images | rg --quiet --case-sensitive --fixed-strings "$IMAGE"; then
+        echo 'Creating image'
+        podman-create-image
+      fi
     '';
 
 
-  # TODO: it does not work
-  testsPodmanInstall = pkgsAllowUnfree.writeShellScriptBin "tests-podman-install" ''
-    #!${pkgsAllowUnfree.runtimeShell}
-      
+  podmanCreateImage = pkgsAllowUnfree.writeShellScriptBin "podman-create-image" ''
+        TAG='3.13.0'
+        BASE_IMAGE='docker.io/library/alpine:'"$TAG"
+        CONTAINER='alpine-container-to-commit'
+        IMAGE='alpine-user-with-sudo'
 
-     touch $out
-     cp ${./tests.sh} $out/${./tests.sh}
-     .$out/tests.sh
+        podman \
+        rm \
+        --force \
+        --ignore \
+        "$CONTAINER"
 
+        podman \
+        run \
+        --interactive=true \
+        --name="$CONTAINER" \
+        --tty=false \
+        --rm=false \
+        --user=0 \
+        "$BASE_IMAGE" \
+        sh -c 'apk add --no-cache shadow sudo && groupadd --gid 12345 ada_group && useradd --create-home --no-log-init --uid 6789 --gid ada_group ada_user && apk del shadow'
+
+        #--change ENTRYPOINT=entrypoint.sh \
+        ID=$(podman \
+        commit \
+        "$CONTAINER" \
+        "$IMAGE":"$TAG")
+
+        podman \
+        rm \
+        --force \
+        --ignore \
+        "$CONTAINER"
   '';
 
+  testsApkUser = pkgsAllowUnfree.writeShellScriptBin "apk-user" ''
+        #set -x
+        TAG='3.13.0'
+        BASE_IMAGE='localhost/alpine-user-with-sudo':"$TAG"
 
+
+        podman-create-if-not-existis "$BASE_IMAGE"
+
+        podman \
+        run \
+        --interactive=true \
+        --tty=true \
+        --rm=true \
+        --user=0 \
+        "$BASE_IMAGE" \
+        sh
+  '';
       in
       {
 
@@ -119,13 +178,17 @@
                                          myScript
                                          podmanSetupScript
                                          cleanPodmanSetup
-                                         testsPodmanInstall
                                          clearPodmanCreatedContainersAndMore
+
+                                         podmanCreateImage
+                                         podmanCreateIfNotExistis
+                                         testsApkUser
                           ];
         shellHook = ''
-           #echo "Entering the nix devShell"
+           echo "Entering the nix devShell"
            podman-setup
            extraPodman
+           #apk-user
          '';
 
         };

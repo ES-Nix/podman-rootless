@@ -30,10 +30,10 @@ set -eux pipefail
 #sh -c 'apk add --no-cache curl && curl google.com'
 
 
-curl -fsSL https://get.docker.com | sudo sh \
-&& sudo usermod --append --groups docker "$USER" \
-&& docker --version \
-&& sudo reboot
+#curl -fsSL https://get.docker.com | sudo sh \
+#&& sudo usermod --append --groups docker "$USER" \
+#&& docker --version \
+#&& sudo reboot
 
 docker pull alpine:3.13.0
 
