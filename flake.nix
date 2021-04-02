@@ -13,7 +13,7 @@
 
 
         myScript =  pkgsAllowUnfree.writeShellScriptBin "extraPodman" ''
-          set -x
+          #set -x
           # TODO: add a conditional here to run this mesage only when
           # needs a sudo call, i mean, only the first time problably.
           # No call for sudo is neede after de first time (in most cases)
@@ -165,8 +165,8 @@
   testsApkUser = pkgsAllowUnfree.writeShellScriptBin "apk-user" ''
         #set -x
         TAG='3.13.0'
-        IMAGE='docker.io/lybrari/alpine':"$TAG"
-        BASE_IMAGE='localhost/alpine-user-with-sudo':"$TAG"
+        BASE_IMAGE='docker.io/library/alpine':"$TAG"
+        IMAGE='localhost/alpine-user-with-sudo':"$TAG"
 
         podman-create-if-not-existis "$BASE_IMAGE"
 
@@ -176,7 +176,7 @@
         --tty=true \
         --rm=true \
         --user=0 \
-        "$BASE_IMAGE" \
+        "$IMAGE" \
         sh
   '';
       in
