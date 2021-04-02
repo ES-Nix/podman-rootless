@@ -4,8 +4,8 @@ let
   myScript = pkgs.writeShellScriptBin "compleInstallPodman" ''
     #!${pkgs.stdenv.shell}
     echo 'The wrapper!'
-    ${pkgs.libcap}/bin/setcap cap_setuid+ep $(readlink --canonicalize $(which newuidmap))
-    ${pkgs.libcap}/bin/setcap cap_setgid+ep $(readlink --canonicalize $(which newgidmap))
+    ${pkgs.libcap/bin/setcap} cap_setuid+ep $(readlink --canonicalize $(which newuidmap))
+    ${pkgs.libcap/bin/setcap} cap_setgid+ep $(readlink --canonicalize $(which newgidmap))
 
     chmod -s $(readlink --canonicalize $(which newuidmap))
     chmod -s $(readlink --canonicalize $(which newgidmap))
