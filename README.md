@@ -8,6 +8,8 @@ nix flake clone github:ES-Nix/podman-rootless --dest podman-rootless
 nix develop github:ES-Nix/podman-rootless/324855d116d15a0b54f33c9489cf7c5e6d9cd714 --command ./install-podman.sh && ./test_podman-rootless.sh
 
 
+`nix develop github:ES-Nix/podman-rootless/aac2db39c5e25b3479170dafce2d6fd0e6143b0b`
+
 
 
 IMAGE_VERSION='localhost/nix-oci-dockertools:0.0.1'
@@ -34,3 +36,24 @@ cat $(which extraPodman)
 git clone https://github.com/ES-Nix/podman-rootless.git
 cd podman-rootless/
 git checkout feature/tests
+
+
+
+# direnv
+
+
+stat ~/.config/nix/nix.conf
+
+echo 'keep-derivations = true' >> ~/.config/nix/nix.conf
+echo 'keep-outputs = true' >> ~/.config/nix/nix.conf    
+
+touch ~/.direnvrc                     
+
+echo 'source /run/current-system/sw/share/nix-direnv/direnvrc' >> ~/.direnvrc
+
+DIRENV_PATH=$(echo /nix/store/*-nix-direnv-1.2.4/)/share/nix-direnv
+
+export PATH="$DIRENV_PATH":"$PATH"
+
+echo "use nix" >> .envrc
+direnvrc allow
