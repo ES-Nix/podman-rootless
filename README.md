@@ -8,7 +8,7 @@ nix flake clone github:ES-Nix/podman-rootless --dest podman-rootless
 nix develop github:ES-Nix/podman-rootless/324855d116d15a0b54f33c9489cf7c5e6d9cd714 --command ./install-podman.sh && ./test_podman-rootless.sh
 
 
-`nix develop github:ES-Nix/podman-rootless/aac2db39c5e25b3479170dafce2d6fd0e6143b0b`
+`nix develop github:ES-Nix/podman-rootless/c4a29329c0fc53b1281657baed829a4a8b011cf1`
 
 
 
