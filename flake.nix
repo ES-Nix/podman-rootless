@@ -222,7 +222,10 @@
            echo "Entering the nix devShell"
            podman-setup
            extraPodman
-           apk-user
+
+           export TMPDIR=/tmp
+           podman pull blang/latex
+           #apk-user
          '';
 
         };

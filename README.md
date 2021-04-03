@@ -30,3 +30,7 @@ fi
 setcap cap_setuid+ep "$NEWUIDMAP"
 
 cat $(which extraPodman)
+
+git clone https://github.com/ES-Nix/podman-rootless.git
+cd podman-rootless/
+git checkout feature/tests
