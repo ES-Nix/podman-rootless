@@ -5,6 +5,8 @@ Example of using `nix` + `flakes` to have podman rootless working!
 Oneliner:
 `nix develop github:ES-Nix/podman-rootless/c4a29329c0fc53b1281657baed829a4a8b011cf1`
 
+nix develop github:ES-Nix/podman-rootless/8a8cd879d361bb57ecbbd05fa60685c7b9601fea
+
 ```
 git clone https://github.com/ES-Nix/podman-rootless.git
 cd podman-rootless/
