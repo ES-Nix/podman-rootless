@@ -124,7 +124,7 @@
             IMAGE="$1"
             echo "$IMAGE"
 
-            if ! (( podman images | rg --quiet --case-sensitive --fixed-strings "$IMAGE")); then
+            if ! (( podman images | rg --quiet --case-sensitive --fixed-strings "$IMAGE" )); then
               echo 'Creating image'
               podman-create-image
             else
@@ -135,6 +135,7 @@
         podmanWrapper = pkgsAllowUnfree.writeShellScriptBin "podman-wrapper" ''
           #!${pkgsAllowUnfree.runtimeShell}
             podman-setup
+            sets-needed-podman-capabilities
             #podman pull blang/latex
             #apk-user
         '';
