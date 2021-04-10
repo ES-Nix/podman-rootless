@@ -122,9 +122,9 @@
         podmanCreateIfNotExistis = pkgsAllowUnfree.writeShellScriptBin "podman-create-if-not-existis" ''
           #!${pkgsAllowUnfree.runtimeShell}
             IMAGE="$1"
-            echo "$IMAGE"
+            NAME_TO_SEARCH=$(echo "$IMAGE" | cut --delimiter=':' --field=1)
 
-            if ! (( podman images | rg --quiet --case-sensitive --fixed-strings "$IMAGE" )); then
+            if ! ( podman images | rg --quiet --case-sensitive --fixed-strings "$NAME_TO_SEARCH") ; then
               echo 'Creating image'
               podman-create-image
             else
