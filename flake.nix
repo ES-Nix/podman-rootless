@@ -32,7 +32,7 @@
             self.packages.${system}.mypodman
           ];
           shellHook = ''
-            #echo "Entering the nix devShell"
+            echo "Entering the nix devShell"
             podman-setup-script
             podman-capabilities
             completInstallPodman
