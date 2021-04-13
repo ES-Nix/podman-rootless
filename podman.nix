@@ -14,8 +14,9 @@ let
     NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
 
     RO_OR_RW=$(test-read-only-path)
-
+    echo 'The value is:'"$RO_OR_RW"
     if [ "$RO_OR_RW" == "rw" ]; then
+      echo 'Calling sudo: '"$RO_OR_RW"
       sudo setcap cap_setuid+ep "$NEWUIDMAP"
       sudo setcap cap_setgid+ep "$NEWGIDMAP"
 
