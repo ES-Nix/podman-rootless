@@ -84,7 +84,6 @@ in
 pkgs.stdenv.mkDerivation {
   name = "test-derivation";
   buildInputs = with pkgs; [
-    myScript
     conmon
     podman
     runc
