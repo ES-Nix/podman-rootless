@@ -56,8 +56,11 @@ let
     NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
     NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
 
-    [ -w "$NEWUIDMAP" ] && echo "rw" || echo "ro"
-
+    if [[ -w /nix/store ]]; then
+      echo 'rw'
+    else
+      echo 'ro'
+    fi
   '';
 
   podmanClearConfigFiles = pkgs.writeShellScriptBin "podman-clear-config-files" ''
