@@ -118,7 +118,6 @@ pkgs.stdenv.mkDerivation {
     install -t $out/bin ${pkgs.shadow}/bin/newgidmap
     install -t $out/bin ${pkgs.slirp4netns}/bin/slirp4netns
 
-    install -t $out/bin ${myScript}/bin/completInstallPodman
     install -t $out/bin ${podmanCapabilities}/bin/podman-capabilities
     install -t $out/bin ${podmanSetupScript}/bin/podman-setup-script
     install -t $out/bin ${podmanClearConfigFiles}/bin/podman-clear-config-files
