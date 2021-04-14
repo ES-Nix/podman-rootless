@@ -89,9 +89,11 @@ pkgs.stdenv.mkDerivation {
   name = "test-derivation";
   buildInputs = with pkgs; [
     conmon
+    fuse-overlayfs # https://gist.github.com/adisbladis/187204cb772800489ee3dac4acdd9947#file-podman-shell-nix-L48
     podman
     runc
     shadow
+    skopeo
     slirp4netns
     dockerPodmanCompat
   ];
