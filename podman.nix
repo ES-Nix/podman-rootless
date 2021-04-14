@@ -95,6 +95,8 @@ pkgs.stdenv.mkDerivation {
     shadow
     skopeo
     slirp4netns
+
+    #
     dockerPodmanCompat
   ];
   #src = builtins.filterSource (path: type: false) ./.;
@@ -116,11 +118,13 @@ pkgs.stdenv.mkDerivation {
 
   installPhase = ''
     mkdir --parent $out/bin;
-    install -t $out/bin ${pkgs.podman}/bin/podman
     install -t $out/bin ${pkgs.conmon}/bin/conmon
+    install -t $out/bin ${pkgs.fuse-overlayfs}/bin/fuse-overlayfs
+    install -t $out/bin ${pkgs.podman}/bin/podman
     install -t $out/bin ${pkgs.runc}/bin/runc
-    install -t $out/bin ${pkgs.shadow}/bin/newuidmap
     install -t $out/bin ${pkgs.shadow}/bin/newgidmap
+    install -t $out/bin ${pkgs.shadow}/bin/newuidmap
+    install -t $out/bin ${pkgs.skopeo}/bin/skopeo
     install -t $out/bin ${pkgs.slirp4netns}/bin/slirp4netns
 
     install -t $out/bin ${podmanCapabilities}/bin/podman-capabilities
@@ -128,7 +132,6 @@ pkgs.stdenv.mkDerivation {
     install -t $out/bin ${podmanClearConfigFiles}/bin/podman-clear-config-files
     install -t $out/bin ${podmanClearItsData}/bin/podman-clear-its-data
     install -t $out/bin ${testReadOnlyPath}/bin/test-read-only-path
-
   '';
 
   phases = [ "buildPhase" "installPhase" "fixupPhase" ];
