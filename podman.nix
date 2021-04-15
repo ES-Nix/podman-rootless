@@ -89,6 +89,8 @@ pkgs.stdenv.mkDerivation {
   name = "test-derivation";
   buildInputs = with pkgs; [
     conmon
+    cni
+    cni-plugins # https://github.com/containers/podman/issues/3679
     fuse-overlayfs # https://gist.github.com/adisbladis/187204cb772800489ee3dac4acdd9947#file-podman-shell-nix-L48
     podman
     runc
@@ -119,6 +121,30 @@ pkgs.stdenv.mkDerivation {
   installPhase = ''
     mkdir --parent $out/bin;
     install -t $out/bin ${pkgs.conmon}/bin/conmon
+    install -t $out/bin ${pkgs.cni}/bin/cnitool
+    install -t $out/bin ${pkgs.cni}/bin/noop
+    install -t $out/bin ${pkgs.cni}/bin/sleep
+
+    # How to be DRY here?
+    install -t $out/bin ${pkgs.cni-plugins}/bin/bandwidth
+    install -t $out/bin ${pkgs.cni-plugins}/bin/bridge
+    install -t $out/bin ${pkgs.cni-plugins}/bin/dhcp
+    install -t $out/bin ${pkgs.cni-plugins}/bin/firewall
+    install -t $out/bin ${pkgs.cni-plugins}/bin/flannel
+    install -t $out/bin ${pkgs.cni-plugins}/bin/host-device
+    install -t $out/bin ${pkgs.cni-plugins}/bin/host-local
+    install -t $out/bin ${pkgs.cni-plugins}/bin/ipvlan
+    install -t $out/bin ${pkgs.cni-plugins}/bin/loopback
+    install -t $out/bin ${pkgs.cni-plugins}/bin/macvlan
+    install -t $out/bin ${pkgs.cni-plugins}/bin/portmap
+    install -t $out/bin ${pkgs.cni-plugins}/bin/ptp
+    install -t $out/bin ${pkgs.cni-plugins}/bin/sbr
+    install -t $out/bin ${pkgs.cni-plugins}/bin/ptp
+    install -t $out/bin ${pkgs.cni-plugins}/bin/static
+    install -t $out/bin ${pkgs.cni-plugins}/bin/tuning
+    install -t $out/bin ${pkgs.cni-plugins}/bin/vlan
+    install -t $out/bin ${pkgs.cni-plugins}/bin/vrf
+
     install -t $out/bin ${pkgs.fuse-overlayfs}/bin/fuse-overlayfs
     install -t $out/bin ${pkgs.podman}/bin/podman
     install -t $out/bin ${pkgs.runc}/bin/runc
