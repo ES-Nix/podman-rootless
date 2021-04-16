@@ -28,12 +28,21 @@ let
   # Provides a script that copies required files to ~/
   podmanSetupScript =
     let
+
       registriesConf = pkgs.writeText "registries.conf" ''
         [registries.search]
         registries = ['docker.io']
         [registries.block]
         registries = []
       '';
+
+      storageConf = pkgs.writeText "storage.conf" ''
+        [storage]
+          driver = "overlay"
+          [storage.options]
+            mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs"
+      '';
+
     in
     pkgs.writeShellScriptBin "podman-setup-script" ''
       #!${pkgs.runtimeShell}
@@ -41,8 +50,14 @@ let
       if ! test -f ~/.config/containers/policy.json; then
         install -Dm555 ${pkgs.skopeo.src}/default-policy.json ~/.config/containers/policy.json
       fi
+
       if ! test -f ~/.config/containers/registries.conf; then
         install -Dm555 ${registriesConf} ~/.config/containers/registries.conf
+      fi
+
+      # https://github.com/containers/storage/issues/863
+      if ! test -f ~/.config/containers/storage.conf; then
+        install -Dm555 ${storageConf} ~/.config/containers/storage.conf
       fi
     '';
 
