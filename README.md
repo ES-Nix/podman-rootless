@@ -9,6 +9,20 @@ nix develop github:ES-Nix/podman-rootless/324855d116d15a0b54f33c9489cf7c5e6d9cd7
 
 nix develop github:ES-Nix/podman-rootless/bffe8ae0d5b933b321e9fc0de25d992f5f5540d0
 
+```
+nix \
+develop \
+github:ES-Nix/podman-rootless/706380778786b88d4886a2c43e1924e200cb5023 \
+--command \
+podman \
+run \
+-it \
+alpine:3.13.0 \
+sh \
+-c 'uname --all'
+```
+
+
 
 ## Install via git
 
