@@ -90,13 +90,13 @@ let
     #!${pkgs.runtimeShell}
 
     # TODO: it need tests!
-    podman ps --all --quiet | xargs --no-run-if-empty podman stop \
-    && podman ps --all --quiet | xargs --no-run-if-empty podman rm --force\
+    podman ps --all --quiet | xargs --no-run-if-empty podman rm --force \
     && podman images --quiet | xargs --no-run-if-empty podman rmi --force \
     && podman container prune --force \
     && podman images --quiet | podman image prune --force \
     && podman network ls --quiet | xargs --no-run-if-empty podman network rm \
-    && podman volume ls --quiet | xargs --no-run-if-empty podman volume prune
+    && podman volume prune --force
+    podman pod list --quiet | xargs --no-run-if-empty podman pod rm --force
   '';
 
 in
