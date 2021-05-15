@@ -23,6 +23,10 @@ sh \
 ```
 
 
+nix \
+build \
+github:ES-Nix/podman-rootless/composable-flake#podman
+
 
 ## Install via git
 

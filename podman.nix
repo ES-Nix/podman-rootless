@@ -99,22 +99,27 @@ let
     podman pod list --quiet | xargs --no-run-if-empty podman pod rm --force
   '';
 
+  podmanWrapper = pkgs.writeShellScriptBin "podman" ''
+    ${podmanSetupScript}/bin/podman-setup-script
+    ${pkgs.podman}/bin/podman "$@"
+  '';
+
 in
 pkgs.stdenv.mkDerivation {
-  name = "test-derivation";
+  name = "podman-rootless-derivation";
   buildInputs = with pkgs; [
     conmon
     cni
     cni-plugins # https://github.com/containers/podman/issues/3679
     fuse-overlayfs # https://gist.github.com/adisbladis/187204cb772800489ee3dac4acdd9947#file-podman-shell-nix-L48
-    podman
+    podmanWrapper
     runc
     shadow
     skopeo
     slirp4netns
 
     #
-    dockerPodmanCompat
+    # dockerPodmanCompat
   ];
   #src = builtins.filterSource (path: type: false) ./.;
   #unpackPhase = "true";
@@ -161,7 +166,7 @@ pkgs.stdenv.mkDerivation {
     install -t $out/bin ${pkgs.cni-plugins}/bin/vrf
 
     install -t $out/bin ${pkgs.fuse-overlayfs}/bin/fuse-overlayfs
-    install -t $out/bin ${pkgs.podman}/bin/podman
+    # install -t $out/bin ${pkgs.podman}/bin/podman
     install -t $out/bin ${pkgs.runc}/bin/runc
     install -t $out/bin ${pkgs.shadow}/bin/newgidmap
     install -t $out/bin ${pkgs.shadow}/bin/newuidmap
@@ -173,6 +178,7 @@ pkgs.stdenv.mkDerivation {
     install -t $out/bin ${podmanClearConfigFiles}/bin/podman-clear-config-files
     install -t $out/bin ${podmanClearItsData}/bin/podman-clear-its-data
     install -t $out/bin ${testReadOnlyPath}/bin/test-read-only-path
+    install -t $out/bin ${podmanWrapper}/bin/podman
   '';
 
   phases = [ "buildPhase" "installPhase" "fixupPhase" ];

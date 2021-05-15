@@ -18,7 +18,7 @@
         #    pkgs = nixpkgs.legacyPackages.${system};
         #};
 
-        packages.mypodman = import ./podman.nix {
+        packages.podman = import ./podman.nix {
           pkgs = nixpkgs.legacyPackages.${system};
         };
 
