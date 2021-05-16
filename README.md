@@ -1,5 +1,6 @@
 # podman-rootless
-Example of using nix + flakes to have podman rootless working
+
+Example of using nix + flakes to have podman rootless working.
 
 
 
@@ -22,11 +23,18 @@ sh \
 -c 'uname --all'
 ```
 
-
+```bash
 nix \
 build \
-github:ES-Nix/podman-rootless/composable-flake#podman
+github:ES-Nix/podman-rootless/feature/composable-flake#podman
 
+result/bin/podman run \
+--interactive=true \
+--tty=true \
+alpine:3.13.0 \
+sh \
+-c 'uname --all && apk add --no-cache git && git init'
+```
 
 ## Install via git
 
@@ -36,16 +44,3 @@ cd podman-rootless
 git checkout bffe8ae0d5b933b321e9fc0de25d992f5f5540d0
 nix develop
 ```
-
-
-
-IMAGE_VERSION='localhost/nix-oci-dockertools:0.0.1'
-
-podman run \
---interactive \
---tty \
---rm \
---workdir /code \
---volume "$(pwd)":/code \
-"$IMAGE_VERSION" bash -c "sudo ls -al && id"
-   
