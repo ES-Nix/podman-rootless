@@ -25,6 +25,21 @@ sh \
 
 ```bash
 nix \
+develop \
+github:ES-Nix/podman-rootless/feature/composable-flake \
+--command \
+podman \
+run \
+--interactive=true \
+--tty=true \
+alpine:3.13.0 \
+sh \
+-c 'uname --all && apk add --no-cache git && git init'
+```
+
+
+```bash
+nix \
 build \
 github:ES-Nix/podman-rootless/feature/composable-flake#podman
 

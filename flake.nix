@@ -29,7 +29,7 @@
         devShell = pkgsAllowUnfree.mkShell {
           buildInputs = with pkgsAllowUnfree; [
             self.defaultPackage.${system}
-            self.packages.${system}.mypodman
+            self.packages.${system}.podman
           ];
           shellHook = ''
             # Testing it
