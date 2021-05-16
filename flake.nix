@@ -6,6 +6,9 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
+
+        pkgs = nixpkgs.legacyPackages.${system};
+
         pkgsAllowUnfree = import nixpkgs {
           system = "x86_64-linux";
           config = { allowUnfree = true; };
@@ -13,10 +16,6 @@
 
       in
       {
-        # For FREE packages use:
-        #packages.podman = import ./podman.nix {
-        #    pkgs = nixpkgs.legacyPackages.${system};
-        #};
 
         packages.podman = import ./podman.nix {
           pkgs = nixpkgs.legacyPackages.${system};
@@ -26,17 +25,14 @@
           pkgs = nixpkgs.legacyPackages.${system};
         };
 
-        devShell = pkgsAllowUnfree.mkShell {
-          buildInputs = with pkgsAllowUnfree; [
+        devShell = pkgs.mkShell {
+          buildInputs = with pkgs; [
             self.defaultPackage.${system}
             self.packages.${system}.podman
           ];
           shellHook = ''
-            # Testing it
+            # TODO: it needs to be well documented!
             export TMPDIR=/tmp
-
-            echo "Entering the nix devShell"
-
           '';
         };
       });
