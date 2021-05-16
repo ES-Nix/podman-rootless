@@ -5,23 +5,33 @@ let
 
     # TODO: add a conditional here to run this message only when
     # needs a sudo call, i mean, only the first time problably.
-    # No call for sudo is neede after de first time (in most cases)
+    # No call for sudo is needed after de first time (in most cases)
     # We should check for the actual capabilitie and if they are
     # the ones that podman needs skip the sudo calls.
 
     #echo 'Fixing capabilities. It requires sudo, sorry!'
-    NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
-    NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
+#    NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
+#    NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
+#
+#    RO_OR_RW=$(test-read-only-path)
+#    echo 'The value is:'"$RO_OR_RW"
+#    if [ "$RO_OR_RW" == "rw" ]; then
+#      echo 'Calling sudo: '"$RO_OR_RW"
+#      sudo setcap cap_setuid+ep "$NEWUIDMAP"
+#      sudo setcap cap_setgid+ep "$NEWGIDMAP"
+#
+#      sudo chmod -s "$NEWUIDMAP"
+#      sudo chmod -s "$NEWGIDMAP"
+#    fi
 
-    RO_OR_RW=$(test-read-only-path)
-    echo 'The value is:'"$RO_OR_RW"
-    if [ "$RO_OR_RW" == "rw" ]; then
-      echo 'Calling sudo: '"$RO_OR_RW"
-      sudo setcap cap_setuid+ep "$NEWUIDMAP"
-      sudo setcap cap_setgid+ep "$NEWGIDMAP"
+    if getcap /nix/store/*-podman-rootless-derivation/bin/newuidmap | grep -q cap_setuid+ep; then
+      echo 'Fixing capabilities. It requires sudo, sorry!'
+      sudo setcap cap_setuid+ep /nix/store/*-podman-rootless-derivation/bin/newuidmap
+    fi
 
-      sudo chmod -s "$NEWUIDMAP"
-      sudo chmod -s "$NEWGIDMAP"
+    if getcap /nix/store/*-podman-rootless-derivation/bin/newgidmap | grep -q cap_setgid+ep; then
+      echo 'Fixing capabilities. It requires sudo, sorry!'
+      sudo setcap cap_setgid+ep /nix/store/*-podman-rootless-derivation/bin/newgidmap
     fi
   '';
 
@@ -100,6 +110,7 @@ let
   '';
 
   podmanWrapper = pkgs.writeShellScriptBin "podman" ''
+    ${podmanCapabilities}/bin/podman-capabilities
     ${podmanSetupScript}/bin/podman-setup-script
     ${pkgs.podman}/bin/podman "$@"
   '';

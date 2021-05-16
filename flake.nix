@@ -33,6 +33,7 @@
           shellHook = ''
             # TODO: it needs to be well documented!
             export TMPDIR=/tmp
+            podman-capabilities
           '';
         };
       });
