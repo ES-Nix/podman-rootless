@@ -24,12 +24,12 @@ let
 #      sudo chmod -s "$NEWGIDMAP"
 #    fi
 
-    if getcap /nix/store/*-podman-rootless-derivation/bin/newuidmap | grep -q cap_setuid+ep; then
+    if ! getcap /nix/store/*-podman-rootless-derivation/bin/newuidmap | grep -q cap_setuid+ep; then
       echo 'Fixing capabilities. It requires sudo, sorry!'
       sudo setcap cap_setuid+ep /nix/store/*-podman-rootless-derivation/bin/newuidmap
     fi
 
-    if getcap /nix/store/*-podman-rootless-derivation/bin/newgidmap | grep -q cap_setgid+ep; then
+    if ! getcap /nix/store/*-podman-rootless-derivation/bin/newgidmap | grep -q cap_setgid+ep; then
       echo 'Fixing capabilities. It requires sudo, sorry!'
       sudo setcap cap_setgid+ep /nix/store/*-podman-rootless-derivation/bin/newgidmap
     fi
