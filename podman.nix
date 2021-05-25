@@ -1,17 +1,37 @@
 { pkgs ? import <nixpkgs> { } }:
 let
   podmanCapabilities = pkgs.writeShellScriptBin "podman-capabilities" ''
-    #!${pkgs.runtimeShell}
-
-    # TODO: add a conditional here to run this message only when
-    # needs a sudo call, i mean, only the first time problably.
-    # No call for sudo is needed after de first time (in most cases)
+    # For now using this hack, beenig impure using/calling sudo
+    # for fixing capabilities.
+    # The sudo call must happen only in the first time.
+    # Note that it should work if it is ran as root without
+    # calling/needing `sudo`.
+    #
     # We should check for the actual capabilitie and if they are
-    # the ones that podman needs skip the sudo calls.
+    # the ones that podman needs skip the set of the capabilitie.
 
-    #echo 'Fixing capabilities. It requires sudo, sorry!'
-#    NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
-#    NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
+    if ! getcap /nix/store/*-podman-rootless-derivation/bin/newuidmap | grep -q cap_setuid+ep; then
+      if [ "$(id -u)" = "0" ]; then
+        setcap cap_setuid+ep /nix/store/*-podman-rootless-derivation/bin/newuidmap
+      else
+        echo 'Fixing capabilities. It requires sudo, sorry!'
+        sudo setcap cap_setuid+ep /nix/store/*-podman-rootless-derivation/bin/newuidmap
+      fi
+    fi
+
+    if ! getcap /nix/store/*-podman-rootless-derivation/bin/newgidmap | grep -q cap_setgid+ep; then
+      if [ "$(id -u)" = "0" ]; then
+        setcap cap_setgid+ep /nix/store/*-podman-rootless-derivation/bin/newgidmap
+      else
+        echo 'Fixing capabilities. It requires sudo, sorry!'
+        sudo setcap cap_setgid+ep /nix/store/*-podman-rootless-derivation/bin/newgidmap
+      fi
+    fi
+
+    # Another way would be use `which` and `readlink`. May be use toybox to do this?
+    # echo 'Fixing capabilities. It requires sudo, sorry!'
+    # NEWUIDMAP=$(readlink --canonicalize $(which newuidmap))
+    # NEWGIDMAP=$(readlink --canonicalize $(which newgidmap))
 #
 #    RO_OR_RW=$(test-read-only-path)
 #    echo 'The value is:'"$RO_OR_RW"
@@ -24,21 +44,11 @@ let
 #      sudo chmod -s "$NEWGIDMAP"
 #    fi
 
-    if ! getcap /nix/store/*-podman-rootless-derivation/bin/newuidmap | grep -q cap_setuid+ep; then
-      echo 'Fixing capabilities. It requires sudo, sorry!'
-      sudo setcap cap_setuid+ep /nix/store/*-podman-rootless-derivation/bin/newuidmap
-    fi
-
-    if ! getcap /nix/store/*-podman-rootless-derivation/bin/newgidmap | grep -q cap_setgid+ep; then
-      echo 'Fixing capabilities. It requires sudo, sorry!'
-      sudo setcap cap_setgid+ep /nix/store/*-podman-rootless-derivation/bin/newgidmap
-    fi
   '';
 
   # Provides a script that copies required files to ~/
   podmanSetupScript =
     let
-
       registriesConf = pkgs.writeText "registries.conf" ''
         [registries.search]
         registries = ['docker.io']
@@ -52,10 +62,8 @@ let
           [storage.options]
             mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs"
       '';
-
     in
     pkgs.writeShellScriptBin "podman-setup-script" ''
-      #!${pkgs.runtimeShell}
       # Dont overwrite customised configuration
       if ! test -f ~/.config/containers/policy.json; then
         install -Dm555 ${pkgs.skopeo.src}/default-policy.json ~/.config/containers/policy.json
@@ -90,15 +98,11 @@ let
   '';
 
   podmanClearConfigFiles = pkgs.writeShellScriptBin "podman-clear-config-files" ''
-    #!${pkgs.runtimeShell}
-
      rm --force --verbose ~/.config/containers/policy.json
      rm --force --verbose ~/.config/containers/registries.conf
   '';
 
   podmanClearItsData = pkgs.writeShellScriptBin "podman-clear-its-data" ''
-    #!${pkgs.runtimeShell}
-
     # TODO: it need tests!
     podman ps --all --quiet | xargs --no-run-if-empty podman rm --force \
     && podman images --quiet | xargs --no-run-if-empty podman rmi --force \
@@ -122,7 +126,9 @@ pkgs.stdenv.mkDerivation {
     conmon
     cni
     cni-plugins # https://github.com/containers/podman/issues/3679
+    coreutils
     fuse-overlayfs # https://gist.github.com/adisbladis/187204cb772800489ee3dac4acdd9947#file-podman-shell-nix-L48
+    libcap_progs
     podmanWrapper
     runc
     shadow
