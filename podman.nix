@@ -190,6 +190,11 @@ pkgs.stdenv.mkDerivation {
     install -t $out/bin ${pkgs.skopeo}/bin/skopeo
     install -t $out/bin ${pkgs.slirp4netns}/bin/slirp4netns
 
+    install -t $out/bin ${pkgs.libcap_progs}/bin/capsh
+    install -t $out/bin ${pkgs.libcap_progs}/bin/getcap
+    install -t $out/bin ${pkgs.libcap_progs}/bin/getpcaps
+    install -t $out/bin ${pkgs.libcap_progs}/bin/setcap
+
     install -t $out/bin ${podmanCapabilities}/bin/podman-capabilities
     install -t $out/bin ${podmanSetupScript}/bin/podman-setup-script
     install -t $out/bin ${podmanClearConfigFiles}/bin/podman-clear-config-files
