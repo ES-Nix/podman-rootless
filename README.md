@@ -120,10 +120,12 @@ nixpkgs/84aa23742f6c72501f9cc209f29c438766f5352d#podman \
 --command \
 podman \
 run \
---cap-add=SYS_ADMIN \
+--privileged=true \
 --device=/dev/fuse \
+--device=/dev/kvm \
 --env=DISPLAY=':0.0' \
 --interactive=true \
+--network=host \
 --mount=type=tmpfs,destination=/var/lib/containers \
 --tty=true \
 --rm=true \
@@ -189,6 +191,19 @@ apk add --no-cache python3
 python3 --version
 COMMANDS
 ```
+
+```bash
+podman \
+run \
+--net=host \
+--interactive=true \ 
+--log-level=debug \
+--tty=true \
+k8s.gcr.io/busybox \
+sh
+```
+
+In an debian like OCI image `apt-get update && apt-get install -y podman uidmap runc ca-certificates cni`
 
 
 Refs:
