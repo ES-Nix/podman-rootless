@@ -62,7 +62,7 @@ nix develop
 ```
 
 
-## From nixpkgs with flakes: podmna rootless
+## From nixpkgs with flakes: podman rootless
 
 
 ```bash
