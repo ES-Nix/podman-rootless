@@ -64,7 +64,9 @@ in
 pkgs.stdenv.mkDerivation {
   name = "podman-rootless-derivation";
   buildInputs = with pkgs; [
+    podmanClearItsData
     podmanWrapper
+    podmanSetupScript
     # dockerPodmanCompat
   ];
 
