@@ -47,17 +47,24 @@
           '';
       in
       {
+
+        packages.podman = import ./podman.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+        };
+
+        defaultPackage = import ./podman.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+        };
         
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
-            podman
-            podmanSetupScript
+            self.defaultPackage.${system}
+            self.packages.${system}.podman
          ];
 
           shellHook = ''
             # TODO: document this
             export TMPDIR=/tmp
-
             podman-setup-script	   
           '';
         };
