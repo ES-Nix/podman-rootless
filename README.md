@@ -11,6 +11,7 @@ github:ES-Nix/podman-rootless/from-nixpkgs
 ```bash
 podman \                               
 run \
+--env=PATH="$HOME"/.nix-profile/bin:"$PATH" \
 --device=/dev/kvm \
 --interactive=true \
 --privileged=true \
@@ -30,13 +31,22 @@ COMMANDS
 ```
 
 ```bash
-podman \                               
+podman \      
 run \
+--env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
 --device=/dev/kvm \
+--device=/dev/fuse \
+--env="DISPLAY=${DISPLAY:-:0.0}" \
 --interactive=true \
+--log-level=error \
+--name=fooo \
+--network=host \
+--mount=type=tmpfs,destination=/var/lib/containers \
 --privileged=true \
 --tty=true \
---rm=true \
---volume '/sys/fs/cgroup/':'/sys/fs/cgroup':ro \
+--rm=false \
+--userns=host \
+--user=0 \
+--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
 docker.nix-community.org/nixpkgs/nix-flakes
 ```
