@@ -31,7 +31,7 @@ COMMANDS
 ```
 
 ```bash
-podman \      
+podman \
 run \
 --env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
 --device=/dev/kvm \
@@ -49,4 +49,36 @@ run \
 --user=0 \
 --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
 docker.nix-community.org/nixpkgs/nix-flakes
+
+mkdir --parent --mode=755 ~/.config/nix
+echo 'experimental-features = nix-command flakes ca-references ca-derivations' >> ~/.config/nix/nix.conf
+
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs
+
+podman \
+run \
+--env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
+--device=/dev/kvm \
+--device=/dev/fuse \
+--env="DISPLAY=${DISPLAY:-:0.0}" \
+--interactive=true \
+--log-level=error \
+--name=fooo \
+--network=host \
+--mount=type=tmpfs,destination=/var/lib/containers \
+--privileged=true \
+--tty=true \
+--rm=false \
+--userns=host \
+--user=0 \
+--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
+docker.nix-community.org/nixpkgs/nix-flakes
+
+nix store gc
+nix \
+build \
+github:PedroRegisPOAR/NixOS-configuration.nix#nixosConfigurations.pedroregispoar.config.system.build.toplevel
 ```
