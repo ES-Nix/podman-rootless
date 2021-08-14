@@ -11,7 +11,7 @@ github:ES-Nix/podman-rootless/from-nixpkgs
 ```bash
 podman \                               
 run \
---env=PATH="$HOME"/.nix-profile/bin:"$PATH" \
+--env=PATH=/root/.nix-profile/bin:"$PATH" \
 --device=/dev/kvm \
 --interactive=true \
 --privileged=true \
