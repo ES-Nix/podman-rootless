@@ -10,7 +10,7 @@
       let
 
         pkgs = import nixpkgs {
-          system = "x86_64-linux";
+          inherit system;
         };
 
         # Provides a script that copies required files to ~/
