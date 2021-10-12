@@ -76,7 +76,6 @@ pkgs.stdenv.mkDerivation {
   installPhase = ''
     mkdir --parent $out/bin
 
-    # install -t $out/bin ${pkgs.fuse-overlayfs}/bin/fuse-overlayfs
     # install -t $out/bin ${pkgs.podman}/bin/podman
     
     install -t $out/bin ${podmanSetupScript}/bin/podman-setup-script
