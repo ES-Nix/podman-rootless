@@ -1,37 +1,37 @@
 { pkgs ? import <nixpkgs> { } }:
 let
-        # Provides a script that copies required files to ~/
-        podmanSetupScript =
-          let
-            registriesConf = pkgs.writeText "registries.conf" ''
-              [registries.search]
-              registries = ['docker.io']
-              [registries.block]
-              registries = []
-            '';
-          in
-          pkgs.writeShellScriptBin "podman-setup-script" ''
-            if [ "$(id --user)" = "0" ]; then
-              # Dont overwrite customised configuration
-              if ! test -f /etc/containers/policy.json; then
-                install -Dm555 ${pkgs.skopeo.src}/default-policy.json /etc/containers/policy.json
-              fi
+  # Provides a script that copies required files to ~/
+  podmanSetupScript =
+    let
+      registriesConf = pkgs.writeText "registries.conf" ''
+        [registries.search]
+        registries = ['docker.io']
+        [registries.block]
+        registries = []
+      '';
+    in
+    pkgs.writeShellScriptBin "podman-setup-script" ''
+      if [ "$(id --user)" = "0" ]; then
+        # Dont overwrite customised configuration
+        if ! test -f /etc/containers/policy.json; then
+          install -Dm555 ${pkgs.skopeo.src}/default-policy.json /etc/containers/policy.json
+        fi
 
-              if ! test -f /etc/containers/registries.conf; then
-                install -Dm555 ${registriesConf} /etc/containers/registries.conf
-              fi
+        if ! test -f /etc/containers/registries.conf; then
+          install -Dm555 ${registriesConf} /etc/containers/registries.conf
+        fi
 
-            else
-              # Dont overwrite customised configuration
-              if ! test -f ~/.config/containers/policy.json; then
-                install -Dm555 ${pkgs.skopeo.src}/default-policy.json ~/.config/containers/policy.json
-              fi
+      else
+        # Dont overwrite customised configuration
+        if ! test -f ~/.config/containers/policy.json; then
+          install -Dm555 ${pkgs.skopeo.src}/default-policy.json ~/.config/containers/policy.json
+        fi
 
-              if ! test -f ~/.config/containers/registries.conf; then
-                install -Dm555 ${registriesConf} ~/.config/containers/registries.conf
-              fi
-            fi
-          '';
+        if ! test -f ~/.config/containers/registries.conf; then
+          install -Dm555 ${registriesConf} ~/.config/containers/registries.conf
+        fi
+      fi
+    '';
 
   # Provides a fake "docker" binary mapping to podman
   dockerPodmanCompat = pkgs.runCommandNoCC "docker-podman-compat" { } ''
@@ -40,8 +40,8 @@ let
   '';
 
   podmanClearConfigFiles = pkgs.writeShellScriptBin "podman-clear-config-files" ''
-     rm --force --verbose ~/.config/containers/policy.json
-     rm --force --verbose ~/.config/containers/registries.conf
+    rm --force --verbose ~/.config/containers/policy.json
+    rm --force --verbose ~/.config/containers/registries.conf
   '';
 
   podmanClearItsData = pkgs.writeShellScriptBin "podman-clear-its-data" ''

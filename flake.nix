@@ -55,19 +55,29 @@
         defaultPackage = import ./podman.nix {
           pkgs = nixpkgs.legacyPackages.${system};
         };
-        
+
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             self.defaultPackage.${system}
             self.packages.${system}.podman
-         ];
+          ];
 
           shellHook = ''
             # TODO: document this
             export TMPDIR=/tmp
-            podman-setup-script	   
+            podman-setup-script     
           '';
         };
+
+        checks = {
+          nixpkgs-fmt = pkgs.runCommand "check-nix-format" { } ''
+            ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
+            mkdir $out #sucess
+          '';
+
+          build = self.defaultPackage.${system};
+        };
+
       });
 }
 
