@@ -42,11 +42,11 @@ let
           if ${pkgs.coreutils}/bin/test -w /nix; then
             if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
               ${pkgs.libcap}/bin/setcap cap_setuid+ep $(${pkgs.which}/bin/which newuidmap)
-              ${pkgs.coreutils}/bin/chmod 4755 $(${pkgs.which}/bin/which newuidmap)
+              ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
             else
               if sudo --version >/dev/null 2>&1; then
                 sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep $(${pkgs.which}/bin/which newuidmap)
-                sudo ${pkgs.coreutils}/bin/chmod 4755 $(${pkgs.which}/bin/which newuidmap)
+                sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -57,14 +57,14 @@ let
             exit 101
           fi
         else
-          NEWUIDMAP="${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newuidmap))"
+          NEWUIDMAP="$(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newuidmap))"
           if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
             ${pkgs.libcap}/bin/setcap cap_setuid+ep "$NEWUIDMAP"
-            ${pkgs.coreutils}/bin/chmod 4755 "$NEWUIDMAP"
+            ${pkgs.coreutils}/bin/chmod -v 4755 "$NEWUIDMAP"
           else
             if sudo --version >/dev/null 2>&1; then
               sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep "$NEWUIDMAP"
-              sudo ${pkgs.coreutils}/bin/chmod 4755 "$NEWUIDMAP"
+              sudo ${pkgs.coreutils}/bin/chmod -v 4755 "$NEWUIDMAP"
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
@@ -77,11 +77,11 @@ let
           nix profile install nixpkgs#shadow
           if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
             ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
-            ${pkgs.coreutils}/bin/chmod 4755 $(${pkgs.which}/bin/which newuidmap)
+            ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
           else
             if sudo --version >/dev/null 2>&1; then
               sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
-              sudo ${pkgs.coreutils}/bin/chmod 4755 $(${pkgs.which}/bin/which newuidmap)
+              sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
@@ -101,11 +101,11 @@ let
           if ${pkgs.coreutils}/bin/test -w /nix; then
             if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
               ${pkgs.libcap}/bin/setcap cap_setgid+ep $(${pkgs.which}/bin/which newgidmap)
-              ${pkgs.coreutils}/bin/chmod 4755 $(${pkgs.which}/bin/which newgidmap)
+              ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newgidmap)
             else
               if sudo --version >/dev/null 2>&1; then
                 sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep $(${pkgs.which}/bin/which newgidmap)
-                sudo ${pkgs.coreutils}/bin/chmod 4755 $(${pkgs.which}/bin/which newgidmap)
+                sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newgidmap)
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -116,14 +116,14 @@ let
             exit 101
           fi
         else
-          NEWGIDMAP="${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap))"
+          NEWGIDMAP="$(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap))"
           if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
             ${pkgs.libcap}/bin/setcap cap_setgid+ep "$NEWGIDMAP"
-            ${pkgs.coreutils}/bin/chmod 4755 "$NEWGIDMAP"
+            ${pkgs.coreutils}/bin/chmod -v 4755 "$NEWGIDMAP"
           else
             if sudo --version >/dev/null 2>&1; then
               sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep "$NEWGIDMAP"
-              sudo ${pkgs.coreutils}/bin/chmod 4755 ${pkgs.shadow}/bin/newgidmap
+              sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
@@ -136,11 +136,11 @@ let
           nix profile install nixpkgs#shadow
           if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
             ${pkgs.libcap}/bin/setcap cap_setgid+ep ${pkgs.shadow}/bin/newgidmap
-            ${pkgs.coreutils}/bin/chmod 4755 ${pkgs.shadow}/bin/newgidmap
+            ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
           else
             if sudo --version >/dev/null 2>&1; then
               sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep ${pkgs.shadow}/bin/newgidmap
-              sudo ${pkgs.coreutils}/bin/chmod 4755 ${pkgs.shadow}/bin/newgidmap
+              sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
