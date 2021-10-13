@@ -37,7 +37,7 @@ let
       # https://github.com/containers/podman/issues/2788#issuecomment-479972943
       if newuidmap >/dev/null 2>&1; then
 
-        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newuidmap) | grep -q cap_setuid+ep; then
+        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newuidmap)) | grep -q cap_setuid+ep; then
 
           if ${pkgs.coreutils}/bin/test -w /nix; then
             if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
@@ -78,7 +78,7 @@ let
       #
       if newgidmap >/dev/null 2>&1; then
 
-        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap) | grep -q cap_setgid+ep; the
+        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap)) | grep -q cap_setgid+ep; the
 
           if ${pkgs.coreutils}/bin/test -w /nix; then
             if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
