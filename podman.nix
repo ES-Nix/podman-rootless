@@ -41,10 +41,10 @@ let
 
           if ${pkgs.coreutils}/bin/test -w /nix; then
             if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-              ${pkgs.libcap}/bin/setcap cap_setuid+ep newuidmap
+              ${pkgs.libcap}/bin/setcap cap_setuid+ep $(${pkgs.which}/bin/which newuidmap)
             else
               if sudo --version >/dev/null 2>&1; then
-                sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep newuidmap
+                sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep $(${pkgs.which}/bin/which newuidmap)
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -53,6 +53,18 @@ let
           else
             echo 'Not able to write to /nix. Failed to install.'
             exit 101
+          fi
+        else
+          NEWUIDMAP="${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newuidmap))"
+          if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
+            ${pkgs.libcap}/bin/setcap cap_setuid+ep "$NEWUIDMAP"
+          else
+            if sudo --version >/dev/null 2>&1; then
+              sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep "$NEWUIDMAP"
+            else
+              echo 'You are not either root or have sudo. Failed to install.'
+              exit 100
+            fi
           fi
         fi
       else
@@ -78,14 +90,14 @@ let
       #
       if newgidmap >/dev/null 2>&1; then
 
-        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap)) | grep -q cap_setgid+ep; the
+        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap)) | grep -q cap_setgid+ep; then
 
           if ${pkgs.coreutils}/bin/test -w /nix; then
             if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-              ${pkgs.libcap}/bin/setcap cap_setgid+ep ${pkgs.shadow}/bin/newgidmap
+              ${pkgs.libcap}/bin/setcap cap_setgid+ep $(${pkgs.which}/bin/which newgidmap)
             else
               if sudo --version >/dev/null 2>&1; then
-                sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep ${pkgs.shadow}/bin/newgidmap
+                sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep $(${pkgs.which}/bin/which newgidmap)
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -95,14 +107,23 @@ let
             echo 'Not able to write to /nix. Failed to install.'
             exit 101
           fi
+        else
+          NEWGIDMAP="${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap))"
+          if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
+            ${pkgs.libcap}/bin/setcap cap_setgid+ep "$NEWGIDMAP"
+          else
+            if sudo --version >/dev/null 2>&1; then
+              sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep "$NEWGIDMAP"
+            else
+              echo 'You are not either root or have sudo. Failed to install.'
+              exit 100
+            fi
+          fi
         fi
-
       else
 
         if ${pkgs.coreutils}/bin/test -w /nix; then
-
           nix profile install nixpkgs#shadow
-
           if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
             ${pkgs.libcap}/bin/setcap cap_setgid+ep ${pkgs.shadow}/bin/newgidmap
           else
