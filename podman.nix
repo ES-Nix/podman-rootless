@@ -44,7 +44,7 @@ let
               ${pkgs.libcap}/bin/setcap cap_setuid+ep newuidmap
             else
               if sudo --version >/dev/null 2>&1; then
-                sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep
+                sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep newuidmap
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -63,7 +63,7 @@ let
             ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
           else
             if sudo --version >/dev/null 2>&1; then
-              sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep
+              sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
@@ -82,10 +82,10 @@ let
 
           if ${pkgs.coreutils}/bin/test -w /nix; then
             if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-              ${pkgs.libcap}/bin/setcap cap_setuid+ep newgidmap
+              ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newgidmap
             else
               if sudo --version >/dev/null 2>&1; then
-                sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep
+                sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newgidmap
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -104,7 +104,7 @@ let
             ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newgidmap
           else
             if sudo --version >/dev/null 2>&1; then
-              sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep
+              sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newgidmap
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
