@@ -82,3 +82,15 @@ nix \
 build \
 github:PedroRegisPOAR/NixOS-configuration.nix#nixosConfigurations.pedroregispoar.config.system.build.toplevel
 ```
+
+
+### Testing it
+
+
+```bash
+nix \
+flake \
+check \
+github:ES-Nix/podman-rootless/from-nixpkgs
+```
+
