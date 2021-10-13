@@ -94,3 +94,26 @@ check \
 github:ES-Nix/podman-rootless/from-nixpkgs
 ```
 
+```bash
+nix \
+run \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+-- \
+--version
+```
+
+```bash
+nix \
+build \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+&& result/bin/podman --version
+```
+
+```bash
+nix \
+develop \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+--command \
+podman \
+--version
+```

@@ -45,7 +45,7 @@ let
   '';
 
   podmanClearItsData = pkgs.writeShellScriptBin "podman-clear-its-data" ''
-    # TODO: it need tests!
+    # TODO: it needs tests!
     podman ps --all --quiet | xargs --no-run-if-empty podman rm --force \
     && podman images --quiet | xargs --no-run-if-empty podman rmi --force \
     && podman container prune --force \
