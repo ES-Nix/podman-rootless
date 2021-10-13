@@ -77,11 +77,11 @@ let
           nix profile install nixpkgs#shadow
           if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
             ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
-            ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
+            ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newuidmap
           else
             if sudo --version >/dev/null 2>&1; then
               sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
-              sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
+              sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newuidmap
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
