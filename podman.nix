@@ -48,7 +48,7 @@ let
                 sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep $(${pkgs.which}/bin/which newuidmap)
                 sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
 
-                ${pkgs.libcap}/bin/getcap $(${pkgs.which}/bin/which newuidmap)
+                ${pkgs.libcap}/bin/setcap -v cap_setuid+ep $(${pkgs.which}/bin/which newuidmap)
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -68,7 +68,7 @@ let
               sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep "$NEWUIDMAP"
               sudo ${pkgs.coreutils}/bin/chmod -v 4755 "$NEWUIDMAP"
 
-              ${pkgs.libcap}/bin/getcap "$NEWUIDMAP"
+              ${pkgs.libcap}/bin/setcap -v cap_setuid+ep "$NEWUIDMAP"
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
@@ -87,7 +87,7 @@ let
               sudo ${pkgs.libcap}/bin/setcap cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
               sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newuidmap
 
-              ${pkgs.libcap}/bin/getcap ${pkgs.shadow}/bin/newuidmap
+              ${pkgs.libcap}/bin/setcap -v cap_setuid+ep ${pkgs.shadow}/bin/newuidmap
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
@@ -113,7 +113,7 @@ let
                 sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep $(${pkgs.which}/bin/which newgidmap)
                 sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newgidmap)
 
-                ${pkgs.libcap}/bin/getcap $(${pkgs.which}/bin/which newgidmap)
+                ${pkgs.libcap}/bin/setcap -v cap_setgid+ep $(${pkgs.which}/bin/which newgidmap)
               else
                 echo 'You are not either root or have sudo. Failed to install.'
                 exit 100
@@ -133,7 +133,7 @@ let
               sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep "$NEWGIDMAP"
               sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
 
-              ${pkgs.libcap}/bin/getcap "$NEWGIDMAP"
+              ${pkgs.libcap}/bin/setcap -v cap_setgid+ep "$NEWGIDMAP"
             else
               echo 'You are not either root or have sudo. Failed to install.'
               exit 100
@@ -152,7 +152,7 @@ let
               sudo ${pkgs.libcap}/bin/setcap cap_setgid+ep ${pkgs.shadow}/bin/newgidmap
               sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
 
-              ${pkgs.libcap}/bin/getcap ${pkgs.shadow}/bin/newgidmap
+              ${pkgs.libcap}/bin/setcap -v cap_setgid+ep ${pkgs.shadow}/bin/newgidmap
 
             else
               echo 'You are not either root or have sudo. Failed to install.'
