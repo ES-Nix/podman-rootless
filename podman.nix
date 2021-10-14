@@ -33,136 +33,90 @@ let
       fi
     '';
 
+  fullPathNewugidmap = ''# set -x
+    full_path_newugidmap() {
+
+        BIN_NAME_TO_FIND_FULL_PATH=$1
+        if ! ${pkgs.coreutils}/bin/stat $(${pkgs.which}/bin/which "$BIN_NAME_TO_FIND_FULL_PATH" 2> /dev/null) >/dev/null 2>&1; then
+          exit 100
+        fi
+
+        # echo "$BIN_NAME_TO_FIND_FULL_PATH"
+
+        if ${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which "$BIN_NAME_TO_FIND_FULL_PATH") >/dev/null 2>&1; then
+          echo $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which "$BIN_NAME_TO_FIND_FULL_PATH"))
+          exit 0
+        fi
+
+        if ${pkgs.coreutils}/bin/stat $(${pkgs.which}/bin/which "$BIN_NAME_TO_FIND_FULL_PATH") >/dev/null 2>&1; then
+          echo $(${pkgs.which}/bin/which "$BIN_NAME_TO_FIND_FULL_PATH")
+          exit 0
+        fi
+  }'';
+
+  setcapChmod = ''# set -x
+      setcap_chmod() {
+
+        CAPABILITIE_TO_SET="$1"
+        FULL_BINARY_PATH="$2"
+
+        if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
+          ${pkgs.libcap}/bin/setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+          ${pkgs.coreutils}/bin/chmod -v 4755 "$FULL_BINARY_PATH"
+        else
+          if sudo --version >/dev/null 2>&1; then
+            echo "sudo was found in PATH, trying to setcap and chmod for newuidmap"
+            sudo ${pkgs.libcap}/bin/setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+            sudo ${pkgs.coreutils}/bin/chmod -v 4755 "$FULL_BINARY_PATH"
+
+            ${pkgs.libcap}/bin/setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+          else
+            echo 'You are not either root or have sudo. Failed to install.'
+            exit 100
+          fi
+        fi
+  }'';
+
+  checkNixStoreWritible = ''# set -x
+    check_nix_store_writible() {
+      if ! ${pkgs.coreutils}/bin/test -w /nix; then
+        echo 'Not able to write to /nix. Failed to install.'
+        exit 101
+      fi
+    }
+  '';
+
   podmanSetcapHack = pkgs.writeShellScriptBin "podman-setcap-hack" ''
+
+      ${fullPathNewugidmap}
+      ${setcapChmod}
+      ${checkNixStoreWritible}
+
+      CAP_SETUID='cap_setuid=+ep'
+      CAP_SETGID='cap_setgid=+ep'
+
       # https://github.com/containers/podman/issues/2788#issuecomment-479972943
       if newuidmap >/dev/null 2>&1; then
-
-        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newuidmap)) | grep -q cap_setuid=+ep; then
-
-          if ${pkgs.coreutils}/bin/test -w /nix; then
-            if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-              ${pkgs.libcap}/bin/setcap cap_setuid=+ep $(${pkgs.which}/bin/which newuidmap)
-              ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
-            else
-              if sudo --version >/dev/null 2>&1; then
-                sudo ${pkgs.libcap}/bin/setcap cap_setuid=+ep $(${pkgs.which}/bin/which newuidmap)
-                sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newuidmap)
-
-                ${pkgs.libcap}/bin/setcap -v cap_setuid=+ep $(${pkgs.which}/bin/which newuidmap)
-              else
-                echo 'You are not either root or have sudo. Failed to install.'
-                exit 100
-              fi
-            fi
-          else
-            echo 'Not able to write to /nix. Failed to install.'
-            exit 101
-          fi
-        else
-          NEWUIDMAP="$(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newuidmap))"
-          if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-            ${pkgs.libcap}/bin/setcap cap_setuid=+ep "$NEWUIDMAP"
-            ${pkgs.coreutils}/bin/chmod -v 4755 "$NEWUIDMAP"
-          else
-            if sudo --version >/dev/null 2>&1; then
-              sudo ${pkgs.libcap}/bin/setcap cap_setuid=+ep "$NEWUIDMAP"
-              sudo ${pkgs.coreutils}/bin/chmod -v 4755 "$NEWUIDMAP"
-
-              ${pkgs.libcap}/bin/setcap -v cap_setuid=+ep "$NEWUIDMAP"
-            else
-              echo 'You are not either root or have sudo. Failed to install.'
-              exit 100
-            fi
-          fi
+        if ! ${pkgs.libcap}/bin/getcap $(full_path_newugidmap newuidmap) | grep -q "$CAP_SETUID"; then
+          check_nix_store_writible
+          setcap_chmod "$CAP_SETUID" "$(full_path_newugidmap newuidmap)"
         fi
-      else
-
-        if ${pkgs.coreutils}/bin/test -w /nix; then
-          nix profile install nixpkgs#shadow
-          if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-            ${pkgs.libcap}/bin/setcap cap_setuid=+ep ${pkgs.shadow}/bin/newuidmap
-            ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newuidmap
-          else
-            if sudo --version >/dev/null 2>&1; then
-              sudo ${pkgs.libcap}/bin/setcap cap_setuid=+ep ${pkgs.shadow}/bin/newuidmap
-              sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newuidmap
-
-              ${pkgs.libcap}/bin/setcap -v cap_setuid=+ep ${pkgs.shadow}/bin/newuidmap
-            else
-              echo 'You are not either root or have sudo. Failed to install.'
-              exit 100
-            fi
-          fi
-        else
-          echo 'Not able to write to /nix. Failed to install.'
-          exit 101
-        fi
+      else # If newuidmap was not found try to install it!
+        check_nix_store_writible
+        nix profile install nixpkgs#shadow
+        setcap_chmod "$CAP_SETUID" ${pkgs.shadow}/bin/newuidmap
       fi
 
       #
       if newgidmap >/dev/null 2>&1; then
-
-        if ! ${pkgs.libcap}/bin/getcap $(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap)) | grep -q cap_setgid=+ep; then
-
-          if ${pkgs.coreutils}/bin/test -w /nix; then
-            if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-              ${pkgs.libcap}/bin/setcap cap_setgid=+ep $(${pkgs.which}/bin/which newgidmap)
-              ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newgidmap)
-            else
-              if sudo --version >/dev/null 2>&1; then
-                sudo ${pkgs.libcap}/bin/setcap cap_setgid=+ep $(${pkgs.which}/bin/which newgidmap)
-                sudo ${pkgs.coreutils}/bin/chmod -v 4755 $(${pkgs.which}/bin/which newgidmap)
-
-                ${pkgs.libcap}/bin/setcap -v cap_setgid=+ep $(${pkgs.which}/bin/which newgidmap)
-              else
-                echo 'You are not either root or have sudo. Failed to install.'
-                exit 100
-              fi
-            fi
-          else
-            echo 'Not able to write to /nix. Failed to install.'
-            exit 101
-          fi
-        else
-          NEWGIDMAP="$(${pkgs.coreutils}/bin/readlink --canonicalize $(${pkgs.which}/bin/which newgidmap))"
-          if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-            ${pkgs.libcap}/bin/setcap cap_setgid=+ep "$NEWGIDMAP"
-            ${pkgs.coreutils}/bin/chmod -v 4755 "$NEWGIDMAP"
-          else
-            if sudo --version >/dev/null 2>&1; then
-              sudo ${pkgs.libcap}/bin/setcap cap_setgid=+ep "$NEWGIDMAP"
-              sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
-
-              ${pkgs.libcap}/bin/setcap -v cap_setgid=+ep "$NEWGIDMAP"
-            else
-              echo 'You are not either root or have sudo. Failed to install.'
-              exit 100
-            fi
-          fi
+        if ! ${pkgs.libcap}/bin/getcap $(full_path_newugidmap newgidmap) | grep -q "$CAP_SETGID"; then
+          check_nix_store_writible
+          setcap_chmod "$CAP_SETGID" "$(full_path_newugidmap newgidmap)"
         fi
-      else
-
-        if ${pkgs.coreutils}/bin/test -w /nix; then
-          nix profile install nixpkgs#shadow
-          if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
-            ${pkgs.libcap}/bin/setcap cap_setgid=+ep ${pkgs.shadow}/bin/newgidmap
-            ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
-          else
-            if sudo --version >/dev/null 2>&1; then
-              sudo ${pkgs.libcap}/bin/setcap cap_setgid=+ep ${pkgs.shadow}/bin/newgidmap
-              sudo ${pkgs.coreutils}/bin/chmod -v 4755 ${pkgs.shadow}/bin/newgidmap
-
-              ${pkgs.libcap}/bin/setcap -v cap_setgid=+ep ${pkgs.shadow}/bin/newgidmap
-
-            else
-              echo 'You are not either root or have sudo. Failed to install.'
-              exit 100
-            fi
-          fi
-        else
-          echo 'Not able to write to /nix. Failed to install.'
-          exit 101
-        fi
+      else # If newgidmap was not found try to install it!
+        check_nix_store_writible
+        nix profile install nixpkgs#shadow
+        setcap_chmod "$CAP_SETGID" ${pkgs.shadow}/bin/newgidmap
       fi
   '';
 
@@ -202,6 +156,7 @@ pkgs.stdenv.mkDerivation {
     podmanWrapper
     podmanSetcapHack
     podmanSetupScript
+
     # dockerPodmanCompat
   ];
 
