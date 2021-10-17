@@ -23,7 +23,7 @@ podman \
 && podman \
 run \
 --rm \
-docker.io/library/alpine:3.14.4 \
+docker.io/library/alpine:3.14.2 \
 apk add --no-cache curl
 ```
 
