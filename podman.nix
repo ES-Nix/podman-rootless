@@ -60,16 +60,26 @@ let
         CAPABILITIE_TO_SET="$1"
         FULL_BINARY_PATH="$2"
 
+        # The u+s also works
+        VALUE_TO_CHMOD='4755'
+
+        # echo "$CAPABILITIE_TO_SET"
+        # echo "$FULL_BINARY_PATH"
+#        VERBOSE="-v"
+
         if [ "$(${pkgs.coreutils}/bin/id --user)" = "0" ]; then
           ${pkgs.libcap}/bin/setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
-          ${pkgs.coreutils}/bin/chmod -v 4755 "$FULL_BINARY_PATH"
+          ${pkgs.coreutils}/bin/chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
         else
           if sudo --version >/dev/null 2>&1; then
-            echo "sudo was found in PATH, trying to setcap and chmod for newuidmap"
-            sudo ${pkgs.libcap}/bin/setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
-            sudo ${pkgs.coreutils}/bin/chmod -v 4755 "$FULL_BINARY_PATH"
+            # echo "sudo was found in PATH, trying to setcap and chmod for newuidmap"
 
-            ${pkgs.libcap}/bin/setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+            sudo ${pkgs.coreutils}/bin/chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
+
+#            echo "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+            sudo setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+#            ${pkgs.libcap}/bin/getcap "$FULL_BINARY_PATH"
+#            sudo ${pkgs.libcap}/bin/setcap -v "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
           else
             echo 'You are not either root or have sudo. Failed to install.'
             exit 100
@@ -105,6 +115,11 @@ let
         check_nix_store_writible
         nix profile install nixpkgs#shadow
         setcap_chmod "$CAP_SETUID" ${pkgs.shadow}/bin/newuidmap
+        # Uncomment it when debug
+#        echo '.'
+#        echo $(full_path_newugidmap newuidmap)
+#        stat $(full_path_newugidmap newuidmap)
+#        ${pkgs.libcap}/bin/getcap $(full_path_newugidmap newuidmap)
       fi
 
       #
@@ -117,6 +132,11 @@ let
         check_nix_store_writible
         nix profile install nixpkgs#shadow
         setcap_chmod "$CAP_SETGID" ${pkgs.shadow}/bin/newgidmap
+        # Uncomment it when debugging
+#        echo '.'
+#        echo $(full_path_newugidmap newgidmap)
+#        stat $(full_path_newugidmap newgidmap)
+#        ${pkgs.libcap}/bin/getcap $(full_path_newugidmap newgidmap)
       fi
   '';
 
@@ -145,6 +165,12 @@ let
   podmanWrapper = pkgs.writeShellScriptBin "podman" ''
     ${podmanSetupScript}/bin/podman-setup-script
     ${podmanSetcapHack}/bin/podman-setcap-hack
+
+    # Uncomment it when debug
+#    ${fullPathNewugidmap}
+#    stat /nix/store/4l5d0r8s399g4mvmcsh9a12307axv4pm-shadow-4.8.1/bin/newuidmap
+#    echo $(full_path_newugidmap newuidmap)
+
     ${pkgs.podman}/bin/podman "$@"
   '';
 
