@@ -8,6 +8,25 @@ install \
 github:ES-Nix/podman-rootless/6a498059fc8a120ecc2f0d8e3712f43256c4ee1d
 ```
 
+
+```bash
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+&& nix \
+develop \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+--command \
+podman \
+--version \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.4 \
+apk add --no-cache curl
+```
+
 ```bash
 podman \                               
 run \
@@ -290,4 +309,36 @@ run \
 --rm \
 docker.io/library/alpine:3.14.0 \
 cat /etc/os-release
+```
+
+
+```bash
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.0 \
+cat /etc/os-release
+```
+
+
+```bash
+nix \
+profile \
+install \
+. \
+&& nix \
+develop \
+. \
+--command \
+podman \
+--version \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.0 \
+apk add --no-cache curl
 ```
