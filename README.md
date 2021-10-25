@@ -24,7 +24,9 @@ podman \
 run \
 --rm \
 docker.io/library/alpine:3.14.2 \
-apk add --no-cache curl
+sh \
+-c \
+'apk add --no-cache curl'
 ```
 
 ```bash
@@ -39,7 +41,7 @@ run \
 --volume '/sys/fs/cgroup/':'/sys/fs/cgroup':ro \
 docker.nix-community.org/nixpkgs/nix-flakes \
 <<COMMANDS
-mkdir --parent --mode=755 ~/.config/nix
+mkdir --parent --mode=0755 ~/.config/nix
 echo 'experimental-features = nix-command flakes ca-references ca-derivations' >> ~/.config/nix/nix.conf
 echo begined
 nix build github:ES-Nix/nix-qemu-kvm/dev#qemu.prepare
@@ -105,6 +107,23 @@ github:PedroRegisPOAR/NixOS-configuration.nix#nixosConfigurations.pedroregispoar
 
 ### Testing it
 
+#### Using a QEMU + KVM VM with an ubuntu cloud image and with a volume 
+
+```bash
+rm -fv result *.qcow2*; \
+nix store gc --verbose \
+&& nix build --refresh github:ES-Nix/nix-qemu-kvm/dev#qemu.vm \
+&& nix develop --refresh github:ES-Nix/nix-qemu-kvm/dev \
+--command bash -c 'vm-kill; run-vm-kvm && prepares-volume && ssh-vm'
+```
+
+
+```bash
+vm-kill; reset-to-backup && ssh-vm
+```bash
+
+
+### 
 
 ```bash
 nix \
@@ -136,7 +155,7 @@ run \
 -- \
 run \
 --rm \
-docker.io/library/alpine:3.14.0 \
+docker.io/library/alpine:3.14.2 \
 cat /etc/os-release
 ```
 
@@ -165,7 +184,7 @@ github:ES-Nix/podman-rootless/from-nixpkgs \
 podman \
 run \
 --rm \
-docker.io/library/alpine:3.14.0 \
+docker.io/library/alpine:3.14.2 \
 cat /etc/os-release
 ```
 
@@ -216,15 +235,71 @@ echo "${USER} ALL=(ALL) NOPASSWD:SETENV: ALL" | sudo tee "/etc/sudoers.d/${USER}
 ```
 Adapted from: https://askubuntu.com/a/878705
 
+
+#### Intalling podman from apt
+
 ```bash
 sudo apt-get update \
-&& sudo apt-get install podman
+&& sudo apt-get install -y podman
 ```
 
 ```bash
 getcap $(which newuidmap)
 getcap $(which newgidmap)
 ```
+
+####
+
+#### 
+
+```bash
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends --no-install-suggests uidmap
+```
+
+```bash
+getcap $(which newuidmap)
+getcap $(which newgidmap)
+```
+
+```bash
+sudo setcap 'cap_setuid=+ep' $(which newuidmap)
+sudo setcap 'cap_setgid=+ep' $(which newgidmap)
+```
+
+```bash
+getcap $(which newuidmap)
+getcap $(which newgidmap)
+```
+
+```bash
+nix \
+profile \
+install \
+. \
+&& nix \
+develop \
+. \
+--command \
+podman \
+--version \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.2 \
+apk add --no-cache curl
+```
+
+```bash
+nix profile remove "$(nix eval --raw nixpkgs#shadow)"
+```
+
+```bash
+sudo apt-get remove -y uidmap \
+&& sudo apt-get purge -y uidmap
+```
+
+####
 
 ```bash
 getcap $(readlink -f $(which newuidmap))
@@ -290,7 +365,7 @@ develop \
 podman \
 run \
 --rm \
-docker.io/library/alpine:3.14.0 \
+docker.io/library/alpine:3.14.2 \
 cat \
 /etc/os-release
 ```
@@ -307,7 +382,7 @@ github:ES-Nix/podman-rootless/from-nixpkgs \
 && podman \
 run \
 --rm \
-docker.io/library/alpine:3.14.0 \
+docker.io/library/alpine:3.14.2 \
 cat /etc/os-release
 ```
 
@@ -320,7 +395,7 @@ github:ES-Nix/podman-rootless/from-nixpkgs \
 && podman \
 run \
 --rm \
-docker.io/library/alpine:3.14.0 \
+docker.io/library/alpine:3.14.2 \
 cat /etc/os-release
 ```
 
@@ -339,6 +414,29 @@ podman \
 && podman \
 run \
 --rm \
-docker.io/library/alpine:3.14.0 \
+docker.io/library/alpine:3.14.2 \
 apk add --no-cache curl
 ```
+
+```bash
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+&& nix \
+develop \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+--command \
+podman \
+--version \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.2 \
+apk add --no-cache curl
+```
+
+
+
+sudo cp "$(readlink -f "$(which newuidmap)")" /usr/bin
+sudo cp "$(readlink -f "$(which newgidmap)")" /usr/bin

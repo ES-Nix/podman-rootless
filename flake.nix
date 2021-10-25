@@ -56,10 +56,10 @@
 
                   sudo ${pkgs.coreutils}/bin/chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
 
-      #            echo "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+#                  echo "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
                   sudo setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
-      #            ${pkgs.libcap}/bin/getcap "$FULL_BINARY_PATH"
-      #            sudo ${pkgs.libcap}/bin/setcap -v "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+                  ${pkgs.libcap}/bin/getcap "$FULL_BINARY_PATH"
+                  sudo ${pkgs.libcap}/bin/setcap -v "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
                 else
                   echo 'You are not either root or have sudo. Failed to install.'
                   exit 100
@@ -76,19 +76,6 @@
           }
         '';
 
-#        ccc = pkgs.writeShellScriptBin "ccc" ''# set -x
-#          ccc() {
-#            echo dkçskdjçk
-#            if ! ${pkgs.coreutils}/bin/test -w /nix; then
-#              echo 'Not able to write to /nix. Failed to install.'
-#              exit 101
-#            fi
-#
-#            echo 'The /nix is wratible!'
-#          }
-#          ccc
-#        '';
-
         podmanSetcapHack = pkgs.writeShellScriptBin "podman-setcap-hack" ''
 
             ${fullPathNewugidmap}
@@ -99,7 +86,10 @@
             CAP_SETGID='cap_setgid=+ep'
 
             # https://github.com/containers/podman/issues/2788#issuecomment-479972943
-            if newuidmap >/dev/null 2>&1; then
+            # https://stackoverflow.com/a/677212
+            # if newuidmap >/dev/null 2>&1; then
+            # if ${pkgs.coreutils}/bin/stat $(${pkgs.which}/bin/which newuidmap 2> /dev/null) >/dev/null 2>&1; then
+            if ${pkgs.bash}/bin/command -v newuidmap &> /dev/null; then
               if ! ${pkgs.libcap}/bin/getcap $(full_path_newugidmap newuidmap) | grep -q "$CAP_SETUID"; then
                 check_nix_store_writible
                 setcap_chmod "$CAP_SETUID" "$(full_path_newugidmap newuidmap)"
@@ -116,7 +106,7 @@
             fi
 
             #
-            if newgidmap >/dev/null 2>&1; then
+            if ${pkgs.bash}/bin/command -v newgidmap &> /dev/null; then
               if ! ${pkgs.libcap}/bin/getcap $(full_path_newugidmap newgidmap) | grep -q "$CAP_SETGID"; then
                 check_nix_store_writible
                 setcap_chmod "$CAP_SETGID" "$(full_path_newugidmap newgidmap)"
@@ -150,7 +140,6 @@
             self.defaultPackage.${system}
             self.packages.${system}.podman
             podmanSetcapHack
-#            ccc
           ];
 
           # inputsFrom = [ self.defaultPackage ];
