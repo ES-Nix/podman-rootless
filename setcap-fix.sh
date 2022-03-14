@@ -79,7 +79,7 @@ if command -v newuidmap &> /dev/null; then
   fi
 else # If newuidmap was not found try to install it!
   check_nix_store_writible
-  nix profile install nixpkgs#shadow
+  # nix profile install nixpkgs#shadow
   setcap_chmod "$CAP_SETUID" "$(full_path_newugidmap newuidmap)"
   # Uncomment it when debug
 # echo '.'
@@ -96,7 +96,7 @@ if command -v newgidmap &> /dev/null; then
   fi
 else # If newgidmap was not found try to install it!
   check_nix_store_writible
-  nix profile install nixpkgs#shadow
+  # nix profile install nixpkgs#shadow
   setcap_chmod "$CAP_SETGID" "$(full_path_newugidmap newgidmap)"
   # Uncomment it when debugging
 #              echo '.'
