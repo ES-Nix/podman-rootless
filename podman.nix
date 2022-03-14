@@ -91,6 +91,11 @@ pkgs.stdenv.mkDerivation {
     # dockerPodmanCompat
   ];
 
+  nativeBuildInputs = with pkgs; [ makeWrapper ];
+  propagatedNativeBuildInputs = with pkgs; [
+    shadow
+    hello
+  ];
 
   # buildPhase = dockerPodmanCompat;
 
