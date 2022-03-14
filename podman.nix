@@ -44,6 +44,23 @@ let
     rm --force --verbose ~/.config/containers/registries.conf
   '';
 
+  setcapFixScriptDeps = with pkgs; [
+    bash
+    coreutils
+    gnugrep
+    libcap
+    which
+  ];
+  setcapFixScript = pkgs.runCommandLocal "setcap-fix"
+    { nativeBuildInputs = [ pkgs.makeWrapper ]; }
+    ''
+      install -m755 ${./setcap-fix.sh} -D $out/bin/setcap-fix
+      patchShebangs $out/bin/setcap-fix
+      wrapProgram "$out/bin/setcap-fix" \
+      --prefix PATH : ${pkgs.lib.makeBinPath setcapFixScriptDeps}
+    '';
+
+
   podmanClearItsData = pkgs.writeShellScriptBin "podman-clear-its-data" ''
     # TODO: it needs tests!
     podman ps --all --quiet | xargs --no-run-if-empty podman rm --force \
@@ -56,6 +73,8 @@ let
   '';
 
   podmanWrapper = pkgs.writeShellScriptBin "podman" ''
+
+    ${setcapFixScript}/bin/setcap-fix
     ${podmanSetupScript}/bin/podman-setup-script
 
     ${pkgs.podman}/bin/podman "$@"

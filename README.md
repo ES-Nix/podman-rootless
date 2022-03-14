@@ -120,7 +120,7 @@ nix store gc --verbose \
 
 ```bash
 vm-kill; reset-to-backup && ssh-vm
-```bash
+```
 
 
 ### 
@@ -138,6 +138,17 @@ run \
 github:ES-Nix/podman-rootless/from-nixpkgs \
 -- \
 --version
+```
+
+```bash
+nix \
+run \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+-- \
+run \
+--rm \
+docker.io/library/alpine:3.14.2 \
+cat /etc/os-release
 ```
 
 ```bash
@@ -173,6 +184,27 @@ github:ES-Nix/podman-rootless/from-nixpkgs \
 --command \
 podman \
 --version
+```
+
+
+```bash
+nix \
+profile \
+install \
+.# \
+&& nix \
+develop \
+.# \
+--command \
+podman \
+--version \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+'apk add --no-cache curl'
 ```
 
 ```bash
@@ -440,3 +472,44 @@ apk add --no-cache curl
 
 sudo cp "$(readlink -f "$(which newuidmap)")" /usr/bin
 sudo cp "$(readlink -f "$(which newgidmap)")" /usr/bin
+
+
+
+```bash
+nix \
+profile \
+install \
+.# \
+&& nix \
+develop \
+.# \
+--command \
+podman \
+--version \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+'apk add --no-cache curl'
+```
+
+```bash
+nix profile remove '.*'
+nix store gc --verbose
+```
+
+```bash
+nix \
+profile \
+install \
+.# \
+&& podman \
+run \
+--rm \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+'apk add --no-cache curl'
+```
