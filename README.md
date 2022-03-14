@@ -1,6 +1,45 @@
 # podman-rootless
 Example of using nix + flakes to have podman rootless working
 
+
+```bash
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs
+```
+
+
+```bash
+podman \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+"cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version"
+```
+
+
+```bash
+nix \
+run \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+-- \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+"cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version"
+```
+
 ```bash
 nix \
 profile \
@@ -8,26 +47,6 @@ install \
 github:ES-Nix/podman-rootless/6a498059fc8a120ecc2f0d8e3712f43256c4ee1d
 ```
 
-
-```bash
-nix \
-profile \
-install \
-github:ES-Nix/podman-rootless/from-nixpkgs \
-&& nix \
-develop \
-github:ES-Nix/podman-rootless/from-nixpkgs \
---command \
-podman \
---version \
-&& podman \
-run \
---rm \
-docker.io/library/alpine:3.14.2 \
-sh \
--c \
-'apk add --no-cache curl'
-```
 
 ```bash
 podman \                               
@@ -124,6 +143,43 @@ vm-kill; reset-to-backup && ssh-vm
 
 
 ### 
+
+```bash
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs
+```
+
+
+```bash
+podman \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+"cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version"
+```
+
+```bash
+nix \
+run \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+-- \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+"cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version"
+```
 
 ```bash
 nix \
@@ -513,3 +569,32 @@ sh \
 -c \
 'apk add --no-cache curl'
 ```
+
+
+
+podman \
+run \
+--device=/dev/kvm \
+--device=/dev/fuse \
+--log-level=error \
+--env STORAGE_DRIVER=vfs \
+--env="DISPLAY=${DISPLAY:-:0.0}" \
+--env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
+--interactive=true \
+--privileged=true \
+--tty=true \
+--rm=true \
+--security-opt seccomp=unconfined \
+--security-opt label=disable \
+--user=0 \
+--volume=/tmp/.X11-unix:/tmp/.X11-unix:ro \
+--volume=/etc/localtime:/etc/localtime:ro \
+--volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro \
+--volume=/var/run/docker.sock:/var/run/docker.sock:ro \
+--volume=/lib/modules:/lib/modules:ro \
+--volume=/boot:/boot:ro \
+--volume=/proc/:/proc/:ro \
+--volume="$(echo ~)"/.ssh:/root/.ssh:ro \
+--volume="$(pwd)":/code:rw \
+--workdir=/code \
+docker.io/nixpkgs/nix-flakes
