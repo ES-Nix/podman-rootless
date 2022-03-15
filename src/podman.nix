@@ -1,37 +1,42 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 pkgs.stdenv.mkDerivation rec {
-          name = "podman";
-          buildInputs = with pkgs; [ stdenv ];
-          nativeBuildInputs = with pkgs; [ makeWrapper ];
-          propagatedNativeBuildInputs = with pkgs; [
-            podman
-            shadow
-            cni-plugins
-            (import ./utils/setcap-fix.nix { inherit pkgs;})
-            (import ./utils/podman-minimal-setup-registries-and-policy.nix { inherit pkgs;})
-          ];
+  name = "podman";
+  buildInputs = with pkgs; [ stdenv ];
+  nativeBuildInputs = with pkgs; [ makeWrapper ];
+  propagatedNativeBuildInputs = with pkgs; [
+    podman
+  ]
+  ++
+  # Here are some magic stuff
+  # I am not sure if it is a good idead, may be a default warning about it?
+  (if pkgs.stdenv.isDarwin then [ ] else [ shadow cni-plugins ])
+  ++
+  [
+    (import ./utils/setcap-fix.nix { inherit pkgs; })
+    (import ./utils/podman-minimal-setup-registries-and-policy.nix { inherit pkgs; })
+  ];
 
-          src = builtins.path { path = ./.; name = "podman"; };
-          phases = [ "installPhase" ];
+  src = builtins.path { path = ./.; name = "podman"; };
+  phases = [ "installPhase" ];
 
-          unpackPhase = ":";
+  unpackPhase = ":";
 
-          installPhase = ''
-            mkdir -p $out/bin
+  installPhase = ''
+    mkdir -p $out/bin
 
-            cp -r "${src}"/* $out
-            ls -al $out/
+    cp -r "${src}"/* $out
+    ls -al $out/
 
-            install \
-            -m0755 \
-            $out/podman.sh \
-            -D \
-            $out/bin/podman
+    install \
+    -m0755 \
+    $out/podman.sh \
+    -D \
+    $out/bin/podman
 
-            patchShebangs $out/bin/podman
+    patchShebangs $out/bin/podman
 
-            wrapProgram $out/bin/podman \
-              --prefix PATH : "${pkgs.lib.makeBinPath propagatedNativeBuildInputs }"
-          '';
+    wrapProgram $out/bin/podman \
+      --prefix PATH : "${pkgs.lib.makeBinPath propagatedNativeBuildInputs }"
+  '';
 
-        }
+}

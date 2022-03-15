@@ -36,6 +36,7 @@
         devShell = pkgs.mkShell {
 
           buildInputs = with pkgs; [
+            nixpkgs-fmt
             self.defaultPackage.${system}
             self.packages.${system}.podman
           ];
@@ -44,8 +45,10 @@
           # inputsFrom = builtins.attrValues self.packages.${system};
 
           shellHook = ''
-           # TODO: document this
-           export TMPDIR=/tmp
+            # TODO: document this
+            export TMPDIR=/tmp
+
+            # find . -type f -iname '*.nix' -exec nixpkgs-fmt {} \;
           '';
         };
 

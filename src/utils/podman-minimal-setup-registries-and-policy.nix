@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 let
 
   # Provides a script that copies required files to ~/
@@ -35,24 +35,24 @@ let
     '';
 in
 pkgs.stdenv.mkDerivation rec {
-          name = "podman-minimal-setup-registries-and-policy";
-          buildInputs = with pkgs; [ stdenv ];
-          nativeBuildInputs = with pkgs; [ makeWrapper ];
-          propagatedNativeBuildInputs = with pkgs; [ ];
+  name = "podman-minimal-setup-registries-and-policy";
+  buildInputs = with pkgs; [ stdenv ];
+  nativeBuildInputs = with pkgs; [ makeWrapper ];
+  propagatedNativeBuildInputs = with pkgs; [ ];
 
-          # src = builtins.path { path = ./.; name = "podman-minimal-setup-registries-and-policy"; };
-          phases = [ "installPhase" ];
+  # src = builtins.path { path = ./.; name = "podman-minimal-setup-registries-and-policy"; };
+  phases = [ "installPhase" ];
 
-          unpackPhase = ":";
+  unpackPhase = ":";
 
-          installPhase = ''
-            mkdir -p $out/bin
+  installPhase = ''
+    mkdir -p $out/bin
 
-            cp "${podmanSetupMinimalRegistriesAndPolicy}"/bin/podman-minimal-setup-registries-and-policy \
-            $out/bin/podman-minimal-setup-registries-and-policy
+    cp "${podmanSetupMinimalRegistriesAndPolicy}"/bin/podman-minimal-setup-registries-and-policy \
+    $out/bin/podman-minimal-setup-registries-and-policy
 
-            wrapProgram $out/bin/podman-minimal-setup-registries-and-policy \
-              --prefix PATH : "${ pkgs.lib.makeBinPath [ podmanSetupMinimalRegistriesAndPolicy ] }"
-          '';
+    wrapProgram $out/bin/podman-minimal-setup-registries-and-policy \
+      --prefix PATH : "${ pkgs.lib.makeBinPath [ podmanSetupMinimalRegistriesAndPolicy ] }"
+  '';
 
-        }
+}
