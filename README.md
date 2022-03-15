@@ -47,6 +47,12 @@ sh \
 && python3 --version"
 ```
 
+
+```bash
+nix flake update --override-input nixpkgs github:NixOS/nixpkgs/nixpkgs-unstable
+```
+
+
 ```bash
 nix \
 run \

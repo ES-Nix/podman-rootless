@@ -6,6 +6,7 @@ pkgs.stdenv.mkDerivation rec {
           propagatedNativeBuildInputs = with pkgs; [
             podman
             shadow
+            cni-plugins
             (import ./utils/setcap-fix.nix { inherit pkgs;})
             (import ./utils/podman-minimal-setup-registries-and-policy.nix { inherit pkgs;})
           ];
