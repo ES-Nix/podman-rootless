@@ -40,7 +40,7 @@
             shellcheck
             findutils
 
-            self.packages.${system}.${name}
+            self.packages.${system}
           ];
 
           # inputsFrom = [ self.defaultPackage ];
