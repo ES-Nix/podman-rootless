@@ -89,6 +89,17 @@ sh \
 && python3 --version"
 ```
 
+
+
+```bash
+nix \
+flake \
+check \
+github:ES-Nix/podman-rootless/from-nixpkgs
+```
+
+
+
 ```bash
 nix \
 profile \
