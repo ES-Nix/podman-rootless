@@ -18,12 +18,12 @@ get_full_path_of_new_user_or_group_id_map() {
   # echo "$BIN_NAME_TO_FIND_FULL_PATH"
 
   if readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
-    echo "$(readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")")"
+    readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")"
     exit 0
   fi
 
   if stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
-    echo "$(which "$BIN_NAME_TO_FIND_FULL_PATH")"
+    which "$BIN_NAME_TO_FIND_FULL_PATH"
     exit 0
   fi
 }

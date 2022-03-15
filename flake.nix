@@ -39,8 +39,8 @@
             nixpkgs-fmt
             shellcheck
             findutils
-            self.defaultPackage.${system}
-            self.packages.${system}.podman
+
+            self.packages.${system}.${name}
           ];
 
           # inputsFrom = [ self.defaultPackage ];
@@ -77,7 +77,16 @@
         checks = {
           nixpkgsFmt = pkgs.runCommand "check-nix-format" { } ''
             ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
-            mkdir $out #sucess
+            mkdir $out #success
+          '';
+
+          codeSpell = pkgs.runCommand "codespell"
+            {
+              buildInputs = with pkgs; [ findutils codespell ];
+            } ''
+            find ${./.} -type f -print0 | xargs -0 -n1 codespell -d -q 3 -
+
+            mkdir $out #success
           '';
 
           shellCheck = pkgs.runCommand "shellcheck"
@@ -85,11 +94,9 @@
               buildInputs = with pkgs; [ findutils shellcheck ];
             } ''
 
-            ls -al ${./.}
-            # find ${./.} -type f -iname '*.sh' -exec ${pkgs.shellcheck}/bin/shellcheck {} \;
             find ${./.} -type f -iname '*.sh' -print0 | xargs -0 -n1 shellcheck
 
-            mkdir $out #sucess
+            mkdir $out #success
           '';
 
           build = self.defaultPackage.${system};

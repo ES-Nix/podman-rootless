@@ -345,7 +345,7 @@ echo 'Start kvm stuff...' \
 && getent group kvm || sudo groupadd kvm \
 && sudo usermod --append --groups kvm "$USER" \
 && echo 'End kvm stuff!' \
-&& echo 'Start cgroup v2 instalation...' \
+&& echo 'Start cgroup v2 installation...' \
 && sudo mkdir -p /etc/systemd/system/user@.service.d \
 && sudo sh -c "echo '[Service]' >> /etc/systemd/system/user@.service.d/delegate.conf" \
 && sudo sh -c "echo 'Delegate=yes' >> /etc/systemd/system/user@.service.d/delegate.conf" \
@@ -355,7 +355,7 @@ sed \
 's/^GRUB_CMDLINE_LINUX="/&cgroup_enable=memory swapaccount=1 systemd.unified_cgroup_hierarchy=1 cgroup_no_v1=all/' \
 /etc/default/grub \
 && sudo grub-mkconfig -o /boot/grub/grub.cfg \
-&& echo 'End cgroup v2 instalation...' \
+&& echo 'End cgroup v2 installation...' \
 && echo 'Start ip_forward stuff...' \
 && sudo \
 sed \
