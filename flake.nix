@@ -40,7 +40,7 @@
             shellcheck
             findutils
 
-            self.packages.${name}
+            packages.${name}
           ];
 
           # inputsFrom = [ self.defaultPackage ];
@@ -99,7 +99,7 @@
             mkdir $out #success
           '';
 
-          build = self.defaultPackage.${system};
+          build = packages.default;
 
           setcap-fix = packages.setcap-fix;
           podman-minimal-setup-registries-and-policy = packages.podman-minimal-setup-registries-and-policy;
