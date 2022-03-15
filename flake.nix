@@ -30,7 +30,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
         };
 
-        packages.${system}.default = packages.${name};
+        packages.default = packages.${name}.${system};
 
         # `nix develop`
         devShells.${system}.default = pkgs.mkShell {
