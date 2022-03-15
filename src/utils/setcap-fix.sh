@@ -3,26 +3,37 @@
 # set -x
 
 
-full_path_newugidmap() {
+get_full_path_of_new_user_or_group_id_map() {
+  # In my point of view bash has some weird things, one thing that
+  # I have seen some where in the internet is this idea os
+  # pass a string value through stdout and mix it with exit codes.
+  # For this "really controlled situation (we are in a function)"
+  # I think it is ok to use it.
 
-    BIN_NAME_TO_FIND_FULL_PATH=$1
-    if ! stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH" 2> /dev/null)" >/dev/null 2>&1; then
-      exit 100
-    fi
+  BIN_NAME_TO_FIND_FULL_PATH=$1
+  if ! stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH" 2> /dev/null)" >/dev/null 2>&1; then
+    exit 100
+  fi
 
-    # echo "$BIN_NAME_TO_FIND_FULL_PATH"
+  # echo "$BIN_NAME_TO_FIND_FULL_PATH"
 
-    if readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
-      echo "$(readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")")"
-      exit 0
-    fi
+  if readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
+    echo "$(readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")")"
+    exit 0
+  fi
 
-    if stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
-      echo "$(which "$BIN_NAME_TO_FIND_FULL_PATH")"
-      exit 0
-    fi
+  if stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
+    echo "$(which "$BIN_NAME_TO_FIND_FULL_PATH")"
+    exit 0
+  fi
 }
 
+__sudo(){
+  # I have seen this patter in bash scripts.
+  # All calls to `sudo` must be done using this horrible named
+  # function!
+  sudo "$@"
+}
 
 setcap_chmod() {
 
@@ -40,14 +51,14 @@ setcap_chmod() {
     setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
     chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
   else
-    if sudo --version >/dev/null 2>&1; then
+    if __sudo --version >/dev/null 2>&1; then
       # echo "sudo was found in PATH, trying to setcap and chmod for newuidmap"
 
-      sudo chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
+      __sudo chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
 
 #      echo "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
 #      getcap "$FULL_BINARY_PATH"
-      sudo setcap $VERBOSE "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+      __sudo setcap $VERBOSE "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
     else
       echo 'You are not either root or have sudo. Failed to install.'
       exit 100
@@ -55,10 +66,31 @@ setcap_chmod() {
   fi
 }
 
-check_nix_store_writible() {
+check_if_nix_store_is_writable() {
+  # It is useful for NixOS systems in that
+  # the `/nix` is readonly.
   if ! test -w /nix; then
     echo 'Not able to write to /nix. Failed to install podman.'
     exit 101
+  fi
+}
+
+
+if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
+
+  NEW_U_OR_G_ID_MAP="$1"
+  CAP_SET_U_OR_G_ID="$2"
+
+  if ! getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}"; then
+    check_if_nix_store_is_writable
+    setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
+  fi
+}
+
+if_binary_not_in_path_raise_an_error() {
+  if ! command -v $1 &> /dev/null; then
+    echo 'The binary ' $1 'was not found in PATH'
+    exit 42
   fi
 }
 
@@ -68,39 +100,19 @@ check_nix_store_writible() {
 CAP_SETUID='cap_setuid=+ep'
 CAP_SETGID='cap_setgid=+ep'
 
+
+if_binary_not_in_path_raise_an_error 'newuidmap'
+if_binary_not_in_path_raise_an_error 'newgidmap'
+
+if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
+if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
+
+
+# Uncomment it when debug
+# echo '.'
+# echo "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+# stat "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+# getcap "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+
 # https://github.com/containers/podman/issues/2788#issuecomment-479972943
 # https://stackoverflow.com/a/677212
-# if newuidmap >/dev/null 2>&1; then
-# if stat $(which newuidmap 2> /dev/null) >/dev/null 2>&1; then
-if command -v newuidmap &> /dev/null; then
-  if ! getcap "$(full_path_newugidmap newuidmap)" | grep -q "$CAP_SETUID"; then
-    check_nix_store_writible
-    setcap_chmod "$CAP_SETUID" "$(full_path_newugidmap newuidmap)"
-  fi
-else # If newuidmap was not found try to install it!
-  check_nix_store_writible
-  # nix profile install nixpkgs#shadow
-  setcap_chmod "$CAP_SETUID" "$(full_path_newugidmap newuidmap)"
-  # Uncomment it when debug
-# echo '.'
-# echo "$(full_path_newugidmap newuidmap)"
-# stat "$(full_path_newugidmap newuidmap)"
-# getcap "$(full_path_newugidmap newuidmap)"
-fi
-
-#
-if command -v newgidmap &> /dev/null; then
-  if ! getcap "$(full_path_newugidmap newgidmap)" | grep -q "$CAP_SETGID"; then
-    check_nix_store_writible
-    setcap_chmod "$CAP_SETGID" "$(full_path_newugidmap newgidmap)"
-  fi
-else # If newgidmap was not found try to install it!
-  check_nix_store_writible
-  # nix profile install nixpkgs#shadow
-  setcap_chmod "$CAP_SETGID" "$(full_path_newugidmap newgidmap)"
-  # Uncomment it when debugging
-#              echo '.'
-#              echo $(full_path_newugidmap newgidmap)
-#              stat $(full_path_newugidmap newgidmap)
-#              ${pkgs.libcap}/bin/getcap $(full_path_newugidmap newgidmap)
-fi

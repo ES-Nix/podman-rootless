@@ -11,6 +11,13 @@ github:ES-Nix/podman-rootless/from-nixpkgs
 
 
 ```bash
+nix \
+profile \
+install \
+.#
+```
+
+```bash
 podman \
 run \
 --rm=true \
@@ -42,11 +49,42 @@ sh \
 
 ```bash
 nix \
+run \
+.# \
+-- \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+"cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version"
+```
+
+```bash
+nix \
 profile \
 install \
 github:ES-Nix/podman-rootless/6a498059fc8a120ecc2f0d8e3712f43256c4ee1d
 ```
 
+```bash
+nix profile remove '.*' \
+&& nix store gc \
+&& nix profile install .#podman \
+&& podman \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+"cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version"
+```
 
 ```bash
 podman \                               
