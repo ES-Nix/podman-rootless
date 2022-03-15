@@ -30,10 +30,10 @@
           pkgs = nixpkgs.legacyPackages.${system};
         };
 
-        defaultPackage = packages.${name};
+        packages.${system}.default = packages.${name};
 
         # `nix develop`
-        devShell = pkgs.mkShell {
+        devShells.${system}.default = pkgs.mkShell {
 
           buildInputs = with pkgs; [
             nixpkgs-fmt
