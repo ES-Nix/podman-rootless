@@ -33,7 +33,7 @@
         packages.default = packages.${name};
 
         # `nix develop`
-        devShells.${system}.default = pkgs.mkShell {
+        devShells.default = pkgs.mkShell {
 
           buildInputs = with pkgs; [
             nixpkgs-fmt
