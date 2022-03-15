@@ -47,6 +47,26 @@ sh \
 && python3 --version"
 ```
 
+```bash
+nix \
+shell \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+--command \
+sh \
+-c \
+"podman --version \
+&& podman \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+'cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version'"
+```
+
 
 ```bash
 nix flake update --override-input nixpkgs github:NixOS/nixpkgs/nixpkgs-unstable

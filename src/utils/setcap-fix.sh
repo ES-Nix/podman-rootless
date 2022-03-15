@@ -49,15 +49,18 @@ setcap_chmod() {
 
   if [ "$(id -u)" = "0" ]; then
     setcap "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
+    # shellcheck disable=SC2086
     chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
   else
     if __sudo --version >/dev/null 2>&1; then
       # echo "sudo was found in PATH, trying to setcap and chmod for newuidmap"
 
+      # shellcheck disable=SC2086
       __sudo chmod $VERBOSE "$VALUE_TO_CHMOD" "$FULL_BINARY_PATH"
 
 #      echo "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
 #      getcap "$FULL_BINARY_PATH"
+      # shellcheck disable=SC2086
       __sudo setcap $VERBOSE "$CAPABILITIE_TO_SET" "$FULL_BINARY_PATH"
     else
       echo 'You are not either root or have sudo. Failed to install.'
@@ -88,8 +91,8 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 }
 
 if_binary_not_in_path_raise_an_error() {
-  if ! command -v $1 &> /dev/null; then
-    echo 'The binary ' $1 'was not found in PATH'
+  if ! command -v "$1" 1> /dev/null 2> /dev/null; then
+    echo 'The binary ' "$1" 'was not found in PATH'
     exit 42
   fi
 }

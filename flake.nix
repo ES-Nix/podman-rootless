@@ -37,6 +37,8 @@
 
           buildInputs = with pkgs; [
             nixpkgs-fmt
+            shellcheck
+            findutils
             self.defaultPackage.${system}
             self.packages.${system}.podman
           ];
@@ -73,13 +75,27 @@
         defaultApp = apps.${name};
 
         checks = {
-          nixpkgs-fmt = pkgs.runCommand "check-nix-format" { } ''
+          nixpkgsFmt = pkgs.runCommand "check-nix-format" { } ''
             ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
             mkdir $out #sucess
           '';
 
+          shellCheck = pkgs.runCommand "shellcheck"
+            {
+              buildInputs = with pkgs; [ findutils shellcheck ];
+            } ''
+
+            ls -al ${./.}
+            # find ${./.} -type f -iname '*.sh' -exec ${pkgs.shellcheck}/bin/shellcheck {} \;
+            find ${./.} -type f -iname '*.sh' -print0 | xargs -0 -n1 shellcheck
+
+            mkdir $out #sucess
+          '';
+
           build = self.defaultPackage.${system};
-          # build = packages.${name};
+
+          setcap-fix = packages.setcap-fix;
+          podman-minimal-setup-registries-and-policy = packages.podman-minimal-setup-registries-and-policy;
         };
 
         # hydraJobs = self.packages;
