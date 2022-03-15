@@ -16,7 +16,17 @@
       rec {
 
         # `nix build`
-        packages.${name} = import ./podman.nix {
+        packages.${name} = import ./src/podman.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+        };
+
+        # `nix build .#podman-minimal-setup-registries-and-policy`
+        packages.podman-minimal-setup-registries-and-policy = import ./src/utils/podman-minimal-setup-registries-and-policy.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+        };
+
+        # `nix build .#setcap-fix`
+        packages.setcap-fix = import ./src/utils/setcap-fix.nix {
           pkgs = nixpkgs.legacyPackages.${system};
         };
 
@@ -43,6 +53,18 @@
         apps.${name} = flake-utils.lib.mkApp {
           inherit name;
           drv = packages.${name};
+        };
+
+        # `nix run .#podman-minimal-setup-registries-and-policy`
+        apps.podman-minimal-setup-registries-and-policy = flake-utils.lib.mkApp {
+          name = "podman-minimal-setup-registries-and-policy";
+          drv = packages.podman-minimal-setup-registries-and-policy;
+        };
+
+        # `nix run .#setcap-fix`
+        apps.setcap-fix = flake-utils.lib.mkApp {
+          name = "setcap-fix";
+          drv = packages.setcap-fix;
         };
 
         defaultApp = apps.${name};
