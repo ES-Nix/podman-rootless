@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
 
-echo "$(which newuidmap)"
-echo "$(which newgidmap)"
+which newuidmap
+which newgidmap
 
 echo
 echo
@@ -12,8 +12,8 @@ echo
 echo
 echo
 
-echo "$(which newuidmap)"
-echo "$(which newgidmap)"
+which newuidmap
+which newgidmap
 getcap "$(which newuidmap)"
 getcap "$(which newgidmap)"
 
@@ -27,8 +27,8 @@ echo
 echo
 
 
-echo "$(which newuidmap)"
-echo "$(which newgidmap)"
+which newuidmap
+which newgidmap
 getcap "$(which newuidmap)"
 getcap "$(which newgidmap)"
 
@@ -52,8 +52,8 @@ podman \
 ./src/tests/test_podman-apk-add-curl.sh
 
 
-echo "$(which newuidmap)"
-echo "$(which newgidmap)"
+which newuidmap
+which newgidmap
 stat -c %a "$(readlink -f "$(which newuidmap)")"
 stat -c %a "$(readlink -f "$(which newgidmap)")"
 getcap "$(which newuidmap)"

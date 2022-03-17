@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
 
-echo "$(which newuidmap)"
-echo "$(which newgidmap)"
+which newuidmap
+which newgidmap
 
 getcap "$(which newuidmap)"
 getcap "$(which newgidmap)"
