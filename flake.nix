@@ -43,9 +43,6 @@
             packages.${name}
           ];
 
-          # inputsFrom = [ self.defaultPackage ];
-          # inputsFrom = builtins.attrValues self.packages.${system};
-
           shellHook = ''
             # TODO: document this
             export TMPDIR=/tmp
@@ -95,6 +92,8 @@
             } ''
 
             find ${./.} -type f -iname '*.sh' -print0 | xargs -0 -n1 shellcheck
+
+            # find "''${HOME}" -not \( -path "''${HOME}/code*" -prune \) -exec sudo chown -v ubuntu:ubuntu {} \;
 
             mkdir $out #success
           '';
