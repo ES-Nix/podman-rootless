@@ -103,6 +103,7 @@ work_around_nixos() {
       aux=$(stat -c %a "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}")
       if [ "$aux" != "4511" ] ; then
         __sudo chmod 4511 "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+      fi
     else
       # If the path does not exist, unfortunately, not much can be done
       echo 'Well, the scritp is confused. What environment is this? From '"$0"
