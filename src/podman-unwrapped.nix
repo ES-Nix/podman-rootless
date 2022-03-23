@@ -27,15 +27,16 @@ pkgs.stdenv.mkDerivation rec {
     cp -r "${src}"/* $out
     ls -al $out/
 
+     # Note that the name is changed to just podman
     install \
     -m0755 \
     $out/podman-unwrapped.sh \
     -D \
-    $out/bin/podman-unwrapped
+    $out/bin/podman
 
-    patchShebangs $out/bin/podman-unwrapped
+    patchShebangs $out/bin/podman
 
-    wrapProgram $out/bin/podman-unwrapped \
+    wrapProgram $out/bin/podman \
       --prefix PATH : "${pkgs.lib.makeBinPath propagatedNativeBuildInputs }"
   '';
 
