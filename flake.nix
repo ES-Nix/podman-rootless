@@ -20,6 +20,10 @@
           pkgs = nixpkgs.legacyPackages.${system};
         };
 
+        packages.podman-unwrapped = import ./src/podman-unwrapped.nix {
+          pkgs = nixpkgs.legacyPackages.${system};
+        };
+
         # `nix build .#podman-minimal-setup-registries-and-policy`
         packages.podman-minimal-setup-registries-and-policy = import ./src/utils/podman-minimal-setup-registries-and-policy.nix {
           pkgs = nixpkgs.legacyPackages.${system};
@@ -40,7 +44,9 @@
             shellcheck
             findutils
 
-            packages.${name}
+            # TODO: better check it
+            # packages.${name}
+            packages.podman-unwrapped
           ];
 
           shellHook = ''
@@ -55,6 +61,11 @@
         apps.${name} = flake-utils.lib.mkApp {
           inherit name;
           drv = packages.${name};
+        };
+
+        apps.podman-unwrapped = flake-utils.lib.mkApp {
+          name = "podman-unwrapped";
+          drv = packages.podman-unwrapped;
         };
 
         # `nix run .#podman-minimal-setup-registries-and-policy`

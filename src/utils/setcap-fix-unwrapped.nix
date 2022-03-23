@@ -1,12 +1,13 @@
 { pkgs ? import <nixpkgs> { } }:
 pkgs.stdenv.mkDerivation rec {
-  name = "setcap-fix";
+  name = "setcap-fix-unwrapped";
   buildInputs = with pkgs; [ stdenv ];
   nativeBuildInputs = with pkgs; [ makeWrapper ];
   propagatedNativeBuildInputs = with pkgs; [
     bash
     coreutils
     gnugrep
+    mount
     which
   ]
   ++
@@ -14,7 +15,7 @@ pkgs.stdenv.mkDerivation rec {
   # I am not sure if it is a good idea, may be a default warning about it?
   (if pkgs.stdenv.isDarwin then [ ] else [ libcap ]);
 
-  src = builtins.path { path = ./.; name = "setcap-fix"; };
+  src = builtins.path { path = ./.; name = "setcap-fix-unwrapped"; };
   phases = [ "installPhase" ];
 
   unpackPhase = ":";
@@ -27,13 +28,13 @@ pkgs.stdenv.mkDerivation rec {
 
     install \
     -m0755 \
-    $out/setcap-fix.sh \
+    $out/setcap-fix-unwrapped.sh \
     -D \
-    $out/bin/setcap-fix
+    $out/bin/setcap-fix-unwrapped
 
-    patchShebangs $out/bin/setcap-fix
+    patchShebangs $out/bin/setcap-fix-unwrapped
 
-    wrapProgram $out/bin/setcap-fix \
+    wrapProgram $out/bin/setcap-fix-unwrapped \
       --prefix PATH : "${pkgs.lib.makeBinPath propagatedNativeBuildInputs }"
   '';
 

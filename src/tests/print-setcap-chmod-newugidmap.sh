@@ -29,3 +29,7 @@ stat -c %a "$(readlink -f "$(which newgidmap)")"
 
 stat -c '%U %G' "$(readlink -f "$(which newuidmap)")"
 stat -c '%U %G' "$(readlink -f "$(which newgidmap)")"
+
+
+#stat new{u,g}idmap
+#sudo chmod 4511 newuidmap

@@ -1,11 +1,13 @@
 #!/usr/bin/env sh
 
 
-which newuidmap
-which newgidmap
 
-getcap "$(which newuidmap)"
-getcap "$(which newgidmap)"
 
-stat -c %a "$(readlink -f "$(which newuidmap)")"
-stat -c %a "$(readlink -f "$(which newgidmap)")"
+sudo apt-get update
+sudo apt-get install -y uidmap
+
+
+#sudo apt-get update
+#sudo apt-get install -y podman
+
+# sudo apt-get purge -y podman

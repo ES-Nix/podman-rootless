@@ -123,6 +123,9 @@ sh \
 && python3 --version"
 ```
 
+
+### 
+
 ```bash
 podman \                               
 run \
@@ -197,6 +200,79 @@ nix \
 build \
 github:PedroRegisPOAR/NixOS-configuration.nix#nixosConfigurations.pedroregispoar.config.system.build.toplevel
 ```
+
+
+### Testing the podman-unwrapped
+
+
+```bash
+nix \
+profile \
+install \
+nixpkgs#podman-unwrapped \
+nixpkgs#conmon \
+nixpkgs#runc \
+nixpkgs#slirp4netns \
+&& nix run github:ES-Nix/podman-rootless/from-nixpkgs#podman-minimal-setup-registries-and-policy
+
+podman \
+run \
+--rm=true \
+docker.io/library/alpine:3.14.2 \
+sh \
+-c \
+"cat /etc/os-release \
+&& apk update \
+&& apk add --no-cache python3 \
+&& python3 --version"
+
+#mkdir -p ~/.config/containers
+#cat << 'EOF' >> ~/.config/containers/policy.json
+#{
+#    "default": [
+#        {
+#            "type": "insecureAcceptAnything"
+#        }
+#    ],
+#    "transports":
+#        {
+#            "docker-daemon":
+#                {
+#                    "": [{"type":"insecureAcceptAnything"}]
+#                }
+#        }
+#}
+#EOF
+#
+#mkdir -p ~/.config/containers
+#cat << 'EOF' >> ~/.config/containers/registries.conf
+#[registries.search]
+#registries = ['docker.io']
+#[registries.block]
+#registries = []
+#EOF
+```
+
+
+
+podman \
+run \
+--env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
+--device=/dev/kvm \
+--device=/dev/fuse \
+--env="DISPLAY=${DISPLAY:-:0.0}" \
+--interactive=true \
+--log-level=error \
+--name=fooo \
+--network=host \
+--mount=type=tmpfs,destination=/var/lib/containers \
+--privileged=true \
+--tty=true \
+--rm=true \
+--userns=host \
+--user=0 \
+--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
+docker.nix-community.org/nixpkgs/nix-flakes
 
 
 ### Testing it

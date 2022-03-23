@@ -4,28 +4,20 @@
 
 
 get_full_path_of_new_user_or_group_id_map() {
-  # In my point of view bash has some weird things, one thing that
-  # I have seen some where in the internet is this idea of
-  # pass a string value through stdout and mix it with exit codes.
-  # For this "really controlled situation (we are in a function)"
-  # I think it is ok to use it.
 
   BIN_NAME_TO_FIND_FULL_PATH=$1
-  if ! stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH" 2> /dev/null)" >/dev/null 2>&1; then
-    exit 100
-  fi
 
-  # echo "$BIN_NAME_TO_FIND_FULL_PATH"
-
-  if readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
-    readlink --canonicalize "$(which "$BIN_NAME_TO_FIND_FULL_PATH")"
+  if "$BIN_NAME_TO_FIND_FULL_PATH" == "newgidmap" >/dev/null 2>&1; then
+    echo '/run/wrappers/bin/newgidmap'
     exit 0
   fi
 
-  if stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH")" >/dev/null 2>&1; then
-    which "$BIN_NAME_TO_FIND_FULL_PATH"
+  if "$BIN_NAME_TO_FIND_FULL_PATH" == "newuidmap" >/dev/null 2>&1; then
+    echo '/run/wrappers/bin/newuidmap'
     exit 0
   fi
+
+  echo 'The BIN_NAME_TO_FIND_FULL_PATH is neither: /run/wrappers/bin/newuidmap nor /run/wrappers/bin/newuidmap'
 }
 
 __sudo(){
@@ -72,10 +64,12 @@ setcap_chmod() {
 check_if_nix_store_is_writable() {
   # It is useful for NixOS systems in that
   # the `/nix` is readonly.
-  if ! test -w /nix; then
-    echo 'Not able to write to /nix. Failed to install podman.'
-    exit 101
-  fi
+#  if ! mount | rg -q /nix/; then
+#    #echo 'Not able to write to /nix. Failed to install podman.'
+#    if
+#    exit 101
+#  fi
+  exit 0
 }
 
 
@@ -85,7 +79,7 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
   CAP_SET_U_OR_G_ID="$2"
 
   if ! getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}"; then
-    check_if_nix_store_is_writable
+    # check_if_nix_store_is_writable
     setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
   fi
 }
@@ -104,11 +98,11 @@ CAP_SETUID='cap_setuid=+ep'
 CAP_SETGID='cap_setgid=+ep'
 
 
-if_binary_not_in_path_raise_an_error 'newuidmap'
-if_binary_not_in_path_raise_an_error 'newgidmap'
+# if_binary_not_in_path_raise_an_error 'newuidmap'
+# if_binary_not_in_path_raise_an_error 'newgidmap'
 
-if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
-if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
+#if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
+#if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 
 
 # Uncomment it when debug
