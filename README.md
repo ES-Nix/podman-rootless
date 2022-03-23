@@ -222,7 +222,7 @@ nixpkgs#runc \
 nixpkgs#slirp4netns \
 && nix run github:ES-Nix/podman-rootless/from-nixpkgs#podman-minimal-setup-registries-and-policy
 
-podman \
+podman-unwrapped \
 run \
 --rm=true \
 docker.io/library/alpine:3.14.2 \

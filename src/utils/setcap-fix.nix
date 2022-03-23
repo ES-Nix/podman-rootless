@@ -10,7 +10,7 @@ pkgs.stdenv.mkDerivation rec {
     which
 
     mount
-    rg
+    ripgrep
   ]
   ++
   # Here are some magic stuff.
