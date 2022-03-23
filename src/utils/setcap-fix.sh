@@ -121,7 +121,10 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 
   if ! getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}"; then
     # check_if_nix_store_is_writable
-    setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
+
+    if ! is_nixos; then
+      setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
+    fi
   fi
 }
 
@@ -157,14 +160,12 @@ CAP_SETGID='cap_setgid=+ep'
 # if_binary_not_in_path_raise_an_error 'newuidmap'
 # if_binary_not_in_path_raise_an_error 'newgidmap'
 
-
+if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
+if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 
 if is_nixos; then
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETUID}"
   work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETGID}"
-else
-  if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
-  if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
 
 
