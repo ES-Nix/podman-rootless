@@ -2,7 +2,7 @@
 pkgs.stdenv.mkDerivation rec {
   name = "setcap-fix";
   buildInputs = with pkgs; [ stdenv ];
-  nativeBuildInputs = with pkgs; [ makeWrapper ];
+  nativeBuildInputs = with pkgs; [ makeWrapper hello ];
   propagatedNativeBuildInputs = with pkgs; [
     bash
     coreutils
