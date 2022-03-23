@@ -11,10 +11,6 @@ pkgs.stdenv.mkDerivation rec {
     slirp4netns
   ]
   ++
-  # Here are some magic stuff
-  # I am not sure if it is a good idead, may be a default warning about it?
-  (if pkgs.stdenv.isDarwin then [ ] else [ shadow cni-plugins ])
-  ++
   [
     (import ./utils/setcap-fix-unwrapped.nix { inherit pkgs; })
     (import ./utils/podman-minimal-setup-registries-and-policy.nix { inherit pkgs; })
