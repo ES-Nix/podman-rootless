@@ -132,21 +132,41 @@ if_binary_not_in_path_raise_an_error() {
   fi
 }
 
+is_nixos() {
+  # It is just a workaround, not sure even about
+  # how it could fail
+  if mount | rg -e '.*/nix/store.*\(ro,' ; then
+    echo 'Your system was identified as NixOS by the podman installer.'
+    exit 0
+  else
+    exit 1
+  fi
+}
+
+
 ###
 
 
 CAP_SETUID='cap_setuid=+ep'
 CAP_SETGID='cap_setgid=+ep'
 
+# Since using propagatedNativeBuildInputs these binaries are not still exposed.
+# I think that it is good, no conflicts in PATH.
+# Not sure about some other things that may need these exact binaries in PATH
+# while using podman.
+# if_binary_not_in_path_raise_an_error 'newuidmap'
+# if_binary_not_in_path_raise_an_error 'newgidmap'
 
-if_binary_not_in_path_raise_an_error 'newuidmap'
-if_binary_not_in_path_raise_an_error 'newgidmap'
 
-if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
-if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 
-work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETUID}"
-work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETGID}"
+if is_nixos; then
+  work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETUID}"
+  work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETGID}"
+else
+  if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
+  if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
+fi
+
 
 # Uncomment it when debug
 # echo '.'
