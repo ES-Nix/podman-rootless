@@ -1,6 +1,6 @@
 { pkgs ? import <nixpkgs> { } }:
 pkgs.stdenv.mkDerivation rec {
-  name = "podman-unwrapped";
+  name = "podman";
   buildInputs = with pkgs; [ stdenv ];
   nativeBuildInputs = with pkgs; [ makeWrapper ];
   propagatedNativeBuildInputs = with pkgs; [
