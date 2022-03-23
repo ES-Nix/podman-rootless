@@ -91,7 +91,7 @@ work_around_nixos() {
   # If this binary exists it must be an NixOS system? I hope so!
   # command -v nixos-version 1> /dev/null 2> /dev/null
 
-  if mount | rg -q -e '\(ro,' ; then
+  if rg -e '.*/nix/store.*\(ro,' ; then
 
     if test -f "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" ; then
 
