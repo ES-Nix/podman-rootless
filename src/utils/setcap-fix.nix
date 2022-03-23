@@ -1,8 +1,8 @@
 { pkgs ? import <nixpkgs> { } }:
 pkgs.stdenv.mkDerivation rec {
   name = "setcap-fix";
-  buildInputs = with pkgs; [ stdenv ];
-  nativeBuildInputs = with pkgs; [ makeWrapper hello ];
+  buildInputs = with pkgs; [ stdenv hello ];
+  nativeBuildInputs = with pkgs; [ makeWrapper ];
   propagatedNativeBuildInputs = with pkgs; [
     bash
     coreutils
