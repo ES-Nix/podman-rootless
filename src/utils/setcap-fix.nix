@@ -8,6 +8,9 @@ pkgs.stdenv.mkDerivation rec {
     coreutils
     gnugrep
     which
+
+    mount
+    rg
   ]
   ++
   # Here are some magic stuff.

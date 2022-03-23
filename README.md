@@ -9,6 +9,13 @@ install \
 github:ES-Nix/podman-rootless/from-nixpkgs
 ```
 
+```bash
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs#podman-unwrapped
+```
+
 
 ```bash
 nix \

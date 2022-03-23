@@ -32,6 +32,8 @@ __sudo(){
   # I have seen this patter in bash scripts.
   # All calls to `sudo` must be done using this horrible named
   # function!
+  # I have found my self a good reason for using this wrapper function.
+  # When debugging, it turns out to be really easy to mock the sudo call.
   sudo "$@"
 }
 
@@ -79,13 +81,45 @@ check_if_nix_store_is_writable() {
 }
 
 
+work_around_nixos() {
+  # https://stackoverflow.com/a/11629626
+  set -o nounset
+
+  PATH_TO_NEW_U_OR_G_ID_MAP_RUN="$1"
+  CAP_SET_U_OR_G_ID="$2"
+
+  # If this binary exists it must be an NixOS system? I hope so!
+  # command -v nixos-version 1> /dev/null 2> /dev/null
+
+  if mount | rg -q -e '\(ro,' ; then
+
+    if test -f "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" ; then
+
+      if ! getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"; then
+        __sudo setcap "${CAP_SET_U_OR_G_ID}" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+      fi
+
+      # The NixOS uses this permission in the /run/wrappers/bin/the_binary_name
+      aux=$(stat -c %a "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}")
+      if [ "$aux" != "4511" ] ; then
+        __sudo chmod 4511 "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+    else
+      # If the path does not exist, unfortunately, not much can be done
+      echo 'Well, the scritp is confused. What environment is this? From '"$0"
+      exit 12
+    fi
+  fi
+}
+
+
+
 if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 
   NEW_U_OR_G_ID_MAP="$1"
   CAP_SET_U_OR_G_ID="$2"
 
   if ! getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}"; then
-    check_if_nix_store_is_writable
+    # check_if_nix_store_is_writable
     setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
   fi
 }
@@ -110,6 +144,8 @@ if_binary_not_in_path_raise_an_error 'newgidmap'
 if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
 if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 
+work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETUID}"
+work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETGID}"
 
 # Uncomment it when debug
 # echo '.'
