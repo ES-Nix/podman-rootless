@@ -1,7 +1,19 @@
 #!/usr/bin/env sh
 
+
 # set -x
 
+
+is_nixos() {
+  # It is just a workaround, not sure even about
+  # how it could fail
+  if mount | rg -q -e '.*/nix/store.*\(ro,' ; then
+    echo 'Your system was identified as NixOS by the podman installer.'
+    return 0
+  else
+    return 1
+  fi
+}
 
 get_full_path_of_new_user_or_group_id_map() {
   # In my point of view bash has some weird things, one thing that
@@ -91,25 +103,28 @@ work_around_nixos() {
   # If this binary exists it must be an NixOS system? I hope so!
   # command -v nixos-version 1> /dev/null 2> /dev/null
 
-  if mount | rg -e '.*/nix/store.*\(ro,' ; then
+  echo "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+  if test -f "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" ; then
 
-    if test -f "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" ; then
-
-      if ! getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"; then
-        __sudo setcap "${CAP_SET_U_OR_G_ID}" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
-      fi
-
-      # The NixOS uses this permission in the /run/wrappers/bin/the_binary_name
-      aux=$(stat -c %a "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}")
-      if [ "$aux" != "4511" ] ; then
-        __sudo chmod 4511 "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
-      fi
-    else
-      # If the path does not exist, unfortunately, not much can be done
-      echo 'Well, the scritp is confused. What environment is this? From '"$0"
-      exit 12
+    getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+    echo getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"
+    if ! getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"; then
+      set -e
+      __sudo setcap "${CAP_SET_U_OR_G_ID}" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+      set +e
     fi
+
+    # The NixOS uses this permission in the /run/wrappers/bin/the_binary_name
+    aux=$(stat -c %a "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}")
+    if [ "$aux" != "4511" ] ; then
+      __sudo chmod 4511 "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+    fi
+  else
+    # If the path does not exist, unfortunately, not much can be done
+    echo 'Well, the scritp is confused. What environment is this? From '"$0"
+    exit 12
   fi
+
 }
 
 
@@ -123,6 +138,7 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
     # check_if_nix_store_is_writable
 
     if ! is_nixos; then
+      echo 'Not NixOS'
       setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
     fi
   fi
@@ -135,16 +151,7 @@ if_binary_not_in_path_raise_an_error() {
   fi
 }
 
-is_nixos() {
-  # It is just a workaround, not sure even about
-  # how it could fail
-  if mount | rg -e '.*/nix/store.*\(ro,' ; then
-    echo 'Your system was identified as NixOS by the podman installer.'
-    exit 0
-  else
-    exit 1
-  fi
-}
+
 
 
 ###
@@ -160,12 +167,15 @@ CAP_SETGID='cap_setgid=+ep'
 # if_binary_not_in_path_raise_an_error 'newuidmap'
 # if_binary_not_in_path_raise_an_error 'newgidmap'
 
-if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
-if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 
 if is_nixos; then
-  work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETUID}"
-  work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETGID}"
+  echo 'A'
+  work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
+  work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
+else
+  echo 'B'
+  if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
+  if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
 
 
