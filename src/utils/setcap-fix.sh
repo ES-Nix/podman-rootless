@@ -138,7 +138,9 @@ work_around_nixos() {
 if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 
   NEW_U_OR_G_ID_MAP="$1"
-  CAP_SET_U_OR_G_ID="$2"
+  CAP_SET_U_OR_G_ID_WITH_EQUAL="$2"
+
+  CAP_SET_U_OR_G_ID="$(echo "${CAP_SET_U_OR_G_ID_WITH_EQUAL}" | sed 's/=/?/')"
 
   echo "$(getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")")"
 
