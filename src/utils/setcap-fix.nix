@@ -27,8 +27,7 @@ pkgs.stdenv.mkDerivation rec {
 
     cp -r "${src}"/* $out
     # ls -al $out/
-
-    ls -la "${pkgs.shadow}"/bin
+    # ls -la "${pkgs.shadow}"/bin
 
     substituteInPlace $out/setcap-fix.sh \
       --replace "'newgidmap'" "${pkgs.shadow}/bin/newgidmap" \
