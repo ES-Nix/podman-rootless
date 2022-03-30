@@ -26,7 +26,13 @@ pkgs.stdenv.mkDerivation rec {
     mkdir -p $out/bin
 
     cp -r "${src}"/* $out
-    ls -al $out/
+    # ls -al $out/
+
+    ls -la "${pkgs.shadow}"/bin
+
+    substituteInPlace $out/setcap-fix.sh \
+      --replace "'newgidmap'" "${pkgs.shadow}/bin/newgidmap" \
+      --replace "'newuidmap'" "${pkgs.shadow}/bin/newuidmap"
 
     install \
     -m0755 \

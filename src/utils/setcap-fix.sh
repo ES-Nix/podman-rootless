@@ -167,13 +167,13 @@ CAP_SETGID='cap_setgid=+ep'
 # if_binary_not_in_path_raise_an_error 'newuidmap'
 # if_binary_not_in_path_raise_an_error 'newgidmap'
 
-echo 'WW'
+
 if is_nixos; then
-  echo 'A'
+  # echo 'A'
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
   work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
 else
-  echo 'B'
+  # echo 'B'
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
