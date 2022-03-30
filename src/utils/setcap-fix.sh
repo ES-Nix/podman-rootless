@@ -140,6 +140,8 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
   NEW_U_OR_G_ID_MAP="$1"
   CAP_SET_U_OR_G_ID="$2"
 
+  echo "$(getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")")"
+
   if ! getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}"; then
     # check_if_nix_store_is_writable
 
