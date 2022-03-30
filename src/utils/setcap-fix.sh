@@ -52,7 +52,7 @@ __sudo(){
   # function!
   # I have found my self a good reason for using this wrapper function.
   # When debugging, it turns out to be really easy to mock the sudo call.
-  sudo -k "$@"
+  sudo "$@"
 }
 
 setcap_chmod() {
