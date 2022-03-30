@@ -167,7 +167,7 @@ CAP_SETGID='cap_setgid=+ep'
 # if_binary_not_in_path_raise_an_error 'newuidmap'
 # if_binary_not_in_path_raise_an_error 'newgidmap'
 
-
+echo 'WW'
 if is_nixos; then
   echo 'A'
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
