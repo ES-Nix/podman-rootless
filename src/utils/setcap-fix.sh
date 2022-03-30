@@ -23,6 +23,12 @@ get_full_path_of_new_user_or_group_id_map() {
   # I think it is ok to use it.
 
   BIN_NAME_TO_FIND_FULL_PATH=$1
+
+  if stat "$BIN_NAME_TO_FIND_FULL_PATH" >/dev/null 2>&1; then
+    echo "$BIN_NAME_TO_FIND_FULL_PATH"
+    exit 0
+  fi
+
   if ! stat "$(which "$BIN_NAME_TO_FIND_FULL_PATH" 2> /dev/null)" >/dev/null 2>&1; then
     exit 100
   fi
