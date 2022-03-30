@@ -46,7 +46,7 @@ __sudo(){
   # function!
   # I have found my self a good reason for using this wrapper function.
   # When debugging, it turns out to be really easy to mock the sudo call.
-  sudo "$@"
+  sudo -k "$@"
 }
 
 setcap_chmod() {
@@ -169,11 +169,11 @@ CAP_SETGID='cap_setgid=+ep'
 
 
 if is_nixos; then
-  # echo 'A'
+  echo 'A'
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
   work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
 else
-  # echo 'B'
+  echo 'B'
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
