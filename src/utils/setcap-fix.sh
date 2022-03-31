@@ -137,6 +137,8 @@ work_around_nixos() {
 
 if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 
+  set -e
+
   NEW_U_OR_G_ID_MAP="$1"
   CAP_SET_U_OR_G_ID_WITH_EQUAL="$2"
 
@@ -151,8 +153,8 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 
   stat "${FULL_PATH_TO_BIN}" | grep -q "${PERMISSION_BITS}"
   HAS_CORRECT_PERMISSION_BITS=$?
-  # echo $HAS_CAPABILITIE
-  # echo $HAS_CORRECT_PERMISSION_BITS
+  echo $HAS_CAPABILITIE
+  echo $HAS_CORRECT_PERMISSION_BITS
 
   if [ ! $HAS_CAPABILITIE ] || [ ! $HAS_CORRECT_PERMISSION_BITS ] ; then
 
