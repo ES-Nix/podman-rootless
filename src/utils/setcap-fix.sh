@@ -127,7 +127,7 @@ work_around_nixos() {
     fi
   else
     # If the path does not exist, unfortunately, not much can be done
-    echo 'Well, the scritp is confused. What environment is this? From '"$0"
+    echo 'Well, the script is confused. What environment is this? From '"$0"
     exit 12
   fi
 

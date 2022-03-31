@@ -44,9 +44,9 @@
             shellcheck
             findutils
 
-            # TODO: better check it
-            # packages.${name}
-            packages.podman-unwrapped
+            #
+            packages.${name}
+            # packages.podman-unwrapped
           ];
 
           shellHook = ''
@@ -104,15 +104,13 @@
 
             find ${./.} -type f -iname '*.sh' -print0 | xargs -0 -n1 shellcheck
 
-            # find "''${HOME}" -not \( -path "''${HOME}/code*" -prune \) -exec sudo chown -v ubuntu:ubuntu {} \;
-
             mkdir $out #success
           '';
 
-          build = packages.default;
-
-          setcap-fix = packages.setcap-fix;
-          podman-minimal-setup-registries-and-policy = packages.podman-minimal-setup-registries-and-policy;
+          #build = packages.default;
+          #
+          #setcap-fix = packages.setcap-fix;
+          #podman-minimal-setup-registries-and-policy = packages.podman-minimal-setup-registries-and-policy;
         };
 
         # hydraJobs = self.packages;

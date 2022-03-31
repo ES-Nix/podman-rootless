@@ -7,11 +7,15 @@ get_full_path_of_new_user_or_group_id_map() {
 
   BIN_NAME_TO_FIND_FULL_PATH=$1
 
+  # TODO: test if it breaks if it is changed to shellchek's recomendation
+  # shellcheck disable=SC2284
   if "$BIN_NAME_TO_FIND_FULL_PATH" == "newgidmap" >/dev/null 2>&1; then
     echo '/run/wrappers/bin/newgidmap'
     exit 0
   fi
 
+  # TODO: test if it breaks if it is changed to shellchek's recomendation
+  # shellcheck disable=SC2284
   if "$BIN_NAME_TO_FIND_FULL_PATH" == "newuidmap" >/dev/null 2>&1; then
     echo '/run/wrappers/bin/newuidmap'
     exit 0
@@ -94,8 +98,8 @@ if_binary_not_in_path_raise_an_error() {
 ###
 
 
-CAP_SETUID='cap_setuid=+ep'
-CAP_SETGID='cap_setgid=+ep'
+# CAP_SETUID='cap_setuid=+ep'
+# CAP_SETGID='cap_setgid=+ep'
 
 
 # if_binary_not_in_path_raise_an_error 'newuidmap'

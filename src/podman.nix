@@ -4,12 +4,12 @@ pkgs.stdenv.mkDerivation rec {
   buildInputs = with pkgs; [ stdenv ];
   nativeBuildInputs = with pkgs; [ makeWrapper ];
   propagatedNativeBuildInputs = with pkgs; [
-    podman
+
   ]
   ++
   # Here are some magic stuff
   # I am not sure if it is a good idead, may be a default warning about it?
-  (if pkgs.stdenv.isDarwin then [ ] else [ shadow cni-plugins ])
+  (if pkgs.stdenv.isDarwin then [ ] else [ shadow cni-plugins podman ])
   ++
   [
     (import ./utils/setcap-fix.nix { inherit pkgs; })

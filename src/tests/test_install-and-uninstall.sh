@@ -2,11 +2,13 @@
 
 
 
-ls -al /nix/store/ | grep shadow
+# ls -al /nix/store/ | grep shadow
+ls /nix/store/*-shadow-*.*
 
 nix profile install github:ES-Nix/podman-rootless/from-nixpkgs
 
-ls -al /nix/store/ | grep shadow
+# ls -al /nix/store/ | grep shadow
+ls /nix/store/*-shadow-*.*
 
 nix profile remove '.*'
 
@@ -19,7 +21,8 @@ nix store gc --verbose \
 --option keep-outputs false
 
 
-ls -al /nix/store/ | grep shadow
+# ls -al /nix/store/ | grep shadow
+ls /nix/store/*-shadow-*.*
 
 nix-collect-garbage --delete-old
 

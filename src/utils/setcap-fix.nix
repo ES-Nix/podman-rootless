@@ -27,11 +27,23 @@ pkgs.stdenv.mkDerivation rec {
 
     cp -r "${src}"/* $out
     # ls -al $out/
-    # ls -la "${pkgs.shadow}"/bin
 
+    aux_newgidmap="${
+        (
+        if !pkgs.stdenv.isDarwin
+        then "${pkgs.shadow}/bin/newgidmap"
+        else "")
+    }"
+
+    aux_newuidmap="${
+        (
+        if !pkgs.stdenv.isDarwin
+        then "${pkgs.shadow}/bin/newuidmap"
+        else "")
+    }"
     substituteInPlace $out/setcap-fix.sh \
-      --replace "'newgidmap'" "${pkgs.shadow}/bin/newgidmap" \
-      --replace "'newuidmap'" "${pkgs.shadow}/bin/newuidmap"
+      --replace "'newgidmap'" "$aux_newgidmap" \
+      --replace "'newuidmap'" "$aux_newuidmap"
 
     install \
     -m0755 \

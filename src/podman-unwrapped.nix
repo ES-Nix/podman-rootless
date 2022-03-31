@@ -5,11 +5,9 @@ pkgs.stdenv.mkDerivation rec {
   nativeBuildInputs = with pkgs; [ makeWrapper ];
   propagatedNativeBuildInputs = with pkgs; [
     podman-unwrapped
-
-    conmon
-    runc
-    slirp4netns
   ]
+  ++
+  (if pkgs.stdenv.isDarwin then [ ] else [ conmon runc slirp4netns ])
   ++
   [
     (import ./utils/setcap-fix-unwrapped.nix { inherit pkgs; })
