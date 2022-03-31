@@ -144,14 +144,19 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 
   CAP_SET_U_OR_G_ID="$(echo "${CAP_SET_U_OR_G_ID_WITH_EQUAL}" | sed 's/+//')"
 
-  HAS_CAPABILITIE="$(getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}")"
-  HAS_CORRECT_PERMISSION_BITS="$(stat "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${PERMISSION_BITS}")"
+  FULL_PATH_TO_BIN="$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
 
-  if [ ! "$HAS_CAPABILITIE" ] || [ "$HAS_CORRECT_PERMISSION_BITS" ] ; then
-    # check_if_nix_store_is_writable
+  getcap "${FULL_PATH_TO_BIN}" | grep -q "${CAP_SET_U_OR_G_ID}"
+  HAS_CAPABILITIE=$?
+
+  stat "${FULL_PATH_TO_BIN}" | grep -q "${PERMISSION_BITS}"
+  HAS_CORRECT_PERMISSION_BITS=$?
+  # echo $HAS_CAPABILITIE
+  # echo $HAS_CORRECT_PERMISSION_BITS
+
+  if [ ! "$HAS_CAPABILITIE" ] || [ ! "$HAS_CORRECT_PERMISSION_BITS" ] ; then
 
     if ! is_nixos; then
-      # echo 'Not NixOS'
       setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
     fi
   fi
