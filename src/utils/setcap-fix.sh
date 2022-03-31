@@ -146,12 +146,14 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
   CAP_SET_U_OR_G_ID="$(echo "${CAP_SET_U_OR_G_ID_WITH_EQUAL}" | sed 's/+//')"
 
   FULL_PATH_TO_BIN="$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
+  echo "${FULL_PATH_TO_BIN}"
 
   getcap "${FULL_PATH_TO_BIN}" | grep -q "${CAP_SET_U_OR_G_ID}"
   HAS_CAPABILITIE=$?
 
   stat "${FULL_PATH_TO_BIN}" | grep -q "${PERMISSION_BITS}"
   HAS_CORRECT_PERMISSION_BITS=$?
+
   echo $HAS_CAPABILITIE
   echo $HAS_CORRECT_PERMISSION_BITS
 
