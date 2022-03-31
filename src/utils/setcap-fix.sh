@@ -154,7 +154,7 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
   # echo $HAS_CAPABILITIE
   # echo $HAS_CORRECT_PERMISSION_BITS
 
-  if [ ! "$HAS_CAPABILITIE" ] || [ ! "$HAS_CORRECT_PERMISSION_BITS" ] ; then
+  if [ ! $HAS_CAPABILITIE ] || [ ! $HAS_CORRECT_PERMISSION_BITS ] ; then
 
     if ! is_nixos; then
       setcap_chmod "${CAP_SET_U_OR_G_ID}" "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
