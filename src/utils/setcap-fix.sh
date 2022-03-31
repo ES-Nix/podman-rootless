@@ -146,7 +146,7 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
   CAP_SET_U_OR_G_ID="$(echo "${CAP_SET_U_OR_G_ID_WITH_EQUAL}" | sed 's/+//')"
 
   FULL_PATH_TO_BIN="$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")"
-  echo "${FULL_PATH_TO_BIN}"
+  # echo "${FULL_PATH_TO_BIN}"
 
   getcap "${FULL_PATH_TO_BIN}" | grep -q "${CAP_SET_U_OR_G_ID}"
   HAS_CAPABILITIE=$?
@@ -154,8 +154,8 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
   stat "${FULL_PATH_TO_BIN}" | grep -q "${PERMISSION_BITS}"
   HAS_CORRECT_PERMISSION_BITS=$?
 
-  echo $HAS_CAPABILITIE
-  echo $HAS_CORRECT_PERMISSION_BITS
+  # echo $HAS_CAPABILITIE
+  # echo $HAS_CORRECT_PERMISSION_BITS
 
   if [ $HAS_CAPABILITIE != 0 ] || [ $HAS_CORRECT_PERMISSION_BITS != 0 ] ; then
 
@@ -190,11 +190,11 @@ CAP_SETGID='cap_setgid=+ep'
 
 
 if is_nixos; then
-  echo 'A'
+  # echo 'A'
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
   work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
 else
-  echo 'B'
+  # echo 'B'
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
