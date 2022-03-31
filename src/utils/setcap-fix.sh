@@ -140,9 +140,14 @@ if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
   NEW_U_OR_G_ID_MAP="$1"
   CAP_SET_U_OR_G_ID_WITH_EQUAL="$2"
 
+  PERMISSION_BITS='4755'
+
   CAP_SET_U_OR_G_ID="$(echo "${CAP_SET_U_OR_G_ID_WITH_EQUAL}" | sed 's/+//')"
 
-  if ! getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}"; then
+  HAS_CAPABILITIE="$(getcap "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${CAP_SET_U_OR_G_ID}")"
+  HAS_CORRECT_PERMISSION_BITS="$(stat "$(get_full_path_of_new_user_or_group_id_map "${NEW_U_OR_G_ID_MAP}")" | grep -q "${PERMISSION_BITS}")"
+
+  if [ ! $HAS_CAPABILITIE ] || [ $HAS_CORRECT_PERMISSION_BITS ] ; then
     # check_if_nix_store_is_writable
 
     if ! is_nixos; then

@@ -6,13 +6,15 @@ Example of using nix + flakes to have podman rootless working
 nix \
 profile \
 install \
-github:ES-Nix/podman-rootless/from-nixpkgs
+--refresh \
+github:ES-Nix/podman-rootless/from-nixpkgs#podman
 ```
 
 ```bash
 nix \
 profile \
 install \
+--refresh \
 github:ES-Nix/podman-rootless/from-nixpkgs#podman-unwrapped
 ```
 
@@ -21,6 +23,7 @@ github:ES-Nix/podman-rootless/from-nixpkgs#podman-unwrapped
 nix \
 profile \
 install \
+--refresh \
 .#
 ```
 
