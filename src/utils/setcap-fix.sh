@@ -137,7 +137,6 @@ work_around_nixos() {
 
 if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it() {
 
-  set -e
 
   NEW_U_OR_G_ID_MAP="$1"
   CAP_SET_U_OR_G_ID_WITH_EQUAL="$2"
@@ -189,11 +188,11 @@ CAP_SETGID='cap_setgid=+ep'
 
 
 if is_nixos; then
-  # echo 'A'
+  echo 'A'
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
   work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
 else
-  # echo 'B'
+  echo 'B'
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
