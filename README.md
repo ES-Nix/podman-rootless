@@ -732,7 +732,7 @@ sh \
 ```
 
 
-
+```bash
 podman \
 run \
 --device=/dev/kvm \
@@ -741,6 +741,7 @@ run \
 --env STORAGE_DRIVER=vfs \
 --env="DISPLAY=${DISPLAY:-:0.0}" \
 --env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
+--group-add=keep-groups \
 --interactive=true \
 --privileged=true \
 --tty=true \
@@ -759,3 +760,31 @@ run \
 --volume="$(pwd)":/code:rw \
 --workdir=/code \
 docker.io/nixpkgs/nix-flakes
+```
+
+
+```bash
+sudo apt-get purge -y uidmap
+sudo apt-get autoremove -y
+```
+
+
+###  
+
+
+```bash
+podman \
+run \
+--group-add=keep-groups \
+docker.io/library/alpine:latest \
+sh \
+-c \
+'touch foo-bar'
+```
+
+```bash
+podman \
+run \
+--group-add=keep-groups \ 
+--user="$(cat /etc/subuid | cut -d':' -f3)" ubuntu sh -c 'groups'
+```
