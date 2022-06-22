@@ -489,7 +489,7 @@ echo "${USER} ALL=(ALL) NOPASSWD:SETENV: ALL" | sudo tee "/etc/sudoers.d/${USER}
 Adapted from: https://askubuntu.com/a/878705
 
 
-#### Intalling podman from apt
+#### Installing podman from apt
 
 ```bash
 sudo apt-get update \
