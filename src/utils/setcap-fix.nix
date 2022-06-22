@@ -11,7 +11,7 @@ pkgs.stdenv.mkDerivation rec {
 
     mount
     ripgrep
-    sed
+    gnused
   ]
   ++
   # Here are some magic stuff.
