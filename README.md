@@ -792,3 +792,146 @@ run \
 --group-add=keep-groups \ 
 --user="$(cat /etc/subuid | cut -d':' -f3)" ubuntu sh -c 'groups'
 ```
+
+### Nesting PinP
+
+
+https://www.redhat.com/sysadmin/podman-inside-container
+
+
+```bash
+podman \
+run \
+--interactive=true \
+--privileged=false \
+--tty=true \
+--rm=true \
+--user=podman \
+--device=/dev/fuse \
+quay.io/podman/stable \
+    podman \
+    --version
+```
+
+
+
+```bash
+podman \
+run \
+--interactive=true \
+--privileged=false \
+--tty=true \
+--rm=true \
+--user=podman \
+--device=/dev/fuse \
+quay.io/podman/stable \
+    podman \
+    run \
+    --interactive=true \
+    --privileged=false \
+    --tty=true \
+    --rm=true \
+    docker.io/library/alpine:latest \
+    sh \
+    -c \
+    "echo && cat /etc/os-release"
+```
+
+```bash
+podman \
+run \
+--interactive=true \
+--privileged=false \
+--tty=true \
+--rm=true \
+--user=podman \
+--device=/dev/fuse \
+quay.io/podman/stable \
+    podman \
+    run \
+    --interactive=true \
+    --privileged=false \
+    --tty=true \
+    --rm=true \
+    docker.io/library/ubuntu:latest \
+    bash \
+    -c \
+    "echo && cat /etc/os-release"
+```
+
+
+
+### PinPinP
+
+
+```bash
+podman \
+run \
+--env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
+--events-backend=file \
+--device=/dev/kvm \
+--device=/dev/fuse \
+--env="DISPLAY=${DISPLAY:-:0.0}" \
+--interactive=true \
+--log-level=error \
+--network=host \
+--mount=type=tmpfs,destination=/var/lib/containers \
+--privileged=true \
+--tty=false \
+--rm=true \
+--user=0 \
+--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
+--volume=/tmp/.X11-unix:/tmp/.X11-unix:ro \
+docker.nix-community.org/nixpkgs/nix-flakes \
+<<COMMANDS
+mkdir --parent --mode=755 ~/.config/nix
+echo 'experimental-features = nix-command flakes ca-derivations' >> ~/.config/nix/nix.conf
+
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+&& mkdir -p -m 0755 /var/tmp \
+&& podman \
+run \
+--cgroups=disabled \
+--env=PATH=/root/.nix-profile/bin:/usr/bin:/bin \
+--events-backend=file \
+--env="DISPLAY=${DISPLAY:-:0.0}" \
+--interactive=true \
+--log-level=error \
+--network=host \
+--privileged=true \
+--tty=false \
+--rm=true \
+--user=0 \
+--volume=/sys/fs/cgroup:/sys/fs/cgroup:rw \
+docker.nix-community.org/nixpkgs/nix-flakes \
+<<COMMANDSNESTED
+mkdir --parent --mode=0755 ~/.config/nix
+echo 'experimental-features = nix-command flakes ca-derivations' >> ~/.config/nix/nix.conf
+nix \
+profile \
+install \
+github:ES-Nix/podman-rootless/from-nixpkgs \
+&& mkdir --parent --mode=0755 /var/tmp \
+&& podman \
+run \
+--events-backend=file \
+--storage-driver="vfs" \
+--cgroups=disabled \
+--log-level=error \
+--interactive=true \
+--network=host \
+--tty=true \
+docker.io/library/alpine:3.14.0 \
+sh \
+-c 'apk add --no-cache curl && echo PinPinP'
+COMMANDSNESTED
+COMMANDS
+```
+
+TODO:
+--volume=/etc/localtime:/etc/localtime:ro \
+
+
