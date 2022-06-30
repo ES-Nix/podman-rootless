@@ -47,7 +47,7 @@ get_full_path_of_new_user_or_group_id_map() {
 }
 
 __sudo(){
-  # I have seen this patter in bash scripts.
+  # I have seen this pattern in bash scripts.
   # All calls to `sudo` must be done using this horrible named
   # function!
   # I have found my self a good reason for using this wrapper function.
@@ -200,21 +200,21 @@ CAP_SETGID='cap_setgid=+ep'
 
 
 if is_nixos; then
-  # echo 'A'
+  echo 'A'
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
   work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
 else
-  # echo 'B'
+  echo 'B'
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
 
 
-# Uncomment it when debug
-# echo '.'
-# echo "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
-# stat "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
-# getcap "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+# Uncomment it when debugging
+ echo '.'
+ echo "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+ stat "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+ getcap "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
 
 # https://github.com/containers/podman/issues/2788#issuecomment-479972943
 # https://stackoverflow.com/a/677212
