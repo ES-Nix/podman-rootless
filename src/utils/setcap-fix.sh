@@ -89,6 +89,14 @@ setcap_chmod() {
   fi
 }
 
+set_user_id_and_group_id_for_file_path() {
+  user_id=$1
+  group_id=$2
+  file_path=$3
+
+  __sudo chown $user_id':'$group_id $file_path
+}
+
 check_if_nix_store_is_writable() {
   # It is useful for NixOS systems in that
   # the `/nix` is readonly.
@@ -117,6 +125,7 @@ work_around_nixos() {
     if ! getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"; then
       set -e
       __sudo setcap "${CAP_SET_U_OR_G_ID}" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+      set_user_id_and_group_id_for_file_path $(id -u) $(id -g) "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
       set +e
     fi
 
@@ -124,6 +133,7 @@ work_around_nixos() {
     aux=$(stat -c %a "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}")
     if [ "$aux" != "4511" ] ; then
       __sudo chmod 4511 "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+      set_user_id_and_group_id_for_file_path $(id -u) $(id -g) "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
     fi
   else
     # If the path does not exist, unfortunately, not much can be done
