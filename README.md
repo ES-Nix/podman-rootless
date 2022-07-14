@@ -77,6 +77,7 @@ cat /etc/os-release \
 && apk add --no-cache python3 \
 && python3 --version
 '
+```
 
 
 
