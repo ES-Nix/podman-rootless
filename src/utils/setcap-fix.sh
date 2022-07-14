@@ -94,7 +94,7 @@ set_user_id_and_group_id_for_file_path() {
   group_id=$2
   file_path=$3
 
-  __sudo chown $user_id':'$group_id $file_path
+  __sudo chown "$user_id"':'"$group_id" "$file_path"
 }
 
 check_if_nix_store_is_writable() {
@@ -125,7 +125,7 @@ work_around_nixos() {
     if ! getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"; then
       set -e
       __sudo setcap "${CAP_SET_U_OR_G_ID}" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
-      set_user_id_and_group_id_for_file_path $(id -u) $(id -g) "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+      # set_user_id_and_group_id_for_file_path "$(id -u)" "$(id -g)" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
       set +e
     fi
 
@@ -133,7 +133,7 @@ work_around_nixos() {
     aux=$(stat -c %a "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}")
     if [ "$aux" != "4511" ] ; then
       __sudo chmod 4511 "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
-      set_user_id_and_group_id_for_file_path $(id -u) $(id -g) "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+      # set_user_id_and_group_id_for_file_path "$(id -u)" "$(id -g)" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
     fi
   else
     # If the path does not exist, unfortunately, not much can be done
@@ -200,21 +200,21 @@ CAP_SETGID='cap_setgid=+ep'
 
 
 if is_nixos; then
-  echo 'A'
+  # echo 'The system was identified as an NixOS'
   work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
   work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
 else
-  echo 'B'
+  # echo 'Some nox-NixOS system'
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newgidmap' "${CAP_SETGID}"
 fi
 
 
 # Uncomment it when debugging
- echo '.'
- echo "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
- stat "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
- getcap "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+# echo '.'
+# echo "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+# stat "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
+# getcap "$(get_full_path_of_new_user_or_group_id_map newuidmap)"
 
 # https://github.com/containers/podman/issues/2788#issuecomment-479972943
 # https://stackoverflow.com/a/677212
