@@ -43,6 +43,8 @@ cat /etc/os-release \
 ```
 
 
+#### One liner, nix run ... podman run alpine sh -c '... python3'
+
 ```bash
 nix \
 run \
