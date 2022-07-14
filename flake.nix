@@ -63,6 +63,7 @@
           inherit name;
           drv = packages.${name};
         };
+        apps.default = apps.${name};
 
         apps.podman-unwrapped = flake-utils.lib.mkApp {
           name = "podman-unwrapped";
@@ -80,8 +81,6 @@
           name = "setcap-fix";
           drv = packages.setcap-fix;
         };
-
-        apps.defaultApp = apps.${name};
 
         checks = {
           nixpkgsFmt = pkgs.runCommand "check-nix-format" { } ''
