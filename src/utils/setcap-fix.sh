@@ -1,14 +1,12 @@
 #!/usr/bin/env sh
 
 
-# set -x
-
 
 is_nixos() {
   # It is just a workaround, not sure even about
   # how it could fail
   if mount | rg -q -e '.*/nix/store.*\(ro,' ; then
-    echo 'Your system was identified as NixOS by the podman installer.'
+    # echo 'Your system was identified as NixOS by the podman installer.'
     return 0
   else
     return 1
@@ -52,6 +50,7 @@ __sudo(){
   # function!
   # I have found my self a good reason for using this wrapper function.
   # When debugging, it turns out to be really easy to mock the sudo call.
+  # set -x
   sudo "$@"
 }
 
@@ -117,16 +116,16 @@ work_around_nixos() {
   # If this binary exists it must be an NixOS system? I hope so!
   # command -v nixos-version 1> /dev/null 2> /dev/null
 
-  echo "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+  # echo "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
   if test -f "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" ; then
 
-    getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
-    echo getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"
+    # getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
+    # echo getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"
     if ! getcap "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}" | grep -q "${CAP_SET_U_OR_G_ID}"; then
-      set -e
+      # set -e
       __sudo setcap "${CAP_SET_U_OR_G_ID}" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
       # set_user_id_and_group_id_for_file_path "$(id -u)" "$(id -g)" "${PATH_TO_NEW_U_OR_G_ID_MAP_RUN}"
-      set +e
+      # set +e
     fi
 
     # The NixOS uses this permission in the /run/wrappers/bin/the_binary_name

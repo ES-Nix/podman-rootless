@@ -35,6 +35,7 @@
         };
 
         packages.default = packages.${name};
+        packages.defaultApp = packages.${name};
 
         # `nix develop`
         devShells.default = pkgs.mkShell {
