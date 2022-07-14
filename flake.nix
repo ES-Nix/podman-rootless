@@ -34,8 +34,8 @@
           pkgs = nixpkgs.legacyPackages.${system};
         };
 
-        packages.default = packages.${name};
-        packages.defaultApp = packages.${name};
+        # packages.default = packages.${name};
+        # packages.defaultApp = packages.${name};
 
         # `nix develop`
         devShells.default = pkgs.mkShell {
@@ -81,7 +81,7 @@
           drv = packages.setcap-fix;
         };
 
-        apps.defaultApp = pkgs.${name};
+        apps.defaultApp = apps.${name};
 
         checks = {
           nixpkgsFmt = pkgs.runCommand "check-nix-format" { } ''
