@@ -80,7 +80,7 @@
           drv = packages.setcap-fix;
         };
 
-        defaultApp = apps.${name};
+        apps.defaultApp = pkgs.${name};
 
         checks = {
           nixpkgsFmt = pkgs.runCommand "check-nix-format" { } ''
