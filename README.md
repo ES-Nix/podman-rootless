@@ -141,6 +141,10 @@ github:ES-Nix/podman-rootless/from-nixpkgs
 ```
 
 
+```bash
+export NIXPKGS_ALLOW_BROKEN=1 \
+&& nix flake check --impure .#
+```
 
 ```bash
 nix \
