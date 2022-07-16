@@ -564,7 +564,8 @@ getcap $(which newgidmap)
 nix \
 profile \
 install \
-. \
+--refresh \
+'.#podman' \
 && nix \
 develop \
 . \

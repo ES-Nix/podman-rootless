@@ -199,9 +199,19 @@ CAP_SETGID='cap_setgid=+ep'
 
 
 if is_nixos; then
-  # echo 'The system was identified as an NixOS'
-  work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
-  work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
+
+  # TODO:
+  # which podman | grep -q '/run/current-system/sw/bin/podman'
+  # podman pod ls
+  #
+  # Extra refs:
+  # https://unix.stackexchange.com/a/563563
+  # https://unix.stackexchange.com/questions/119648/redirecting-to-dev-null#comment800581_119650
+  if ! podman images 1> /dev/null 2> /dev/null; then
+    # echo 'The system was identified as an NixOS'
+    work_around_nixos '/run/wrappers/bin/newgidmap' "${CAP_SETGID}"
+    work_around_nixos '/run/wrappers/bin/newuidmap' "${CAP_SETUID}"
+  fi
 else
   # echo 'Some nox-NixOS system'
   if_the_podman_required_permissions_are_not_the_needed_ones_try_fix_it 'newuidmap' "${CAP_SETUID}"
