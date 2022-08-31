@@ -971,3 +971,121 @@ TODO:
 --volume=/etc/localtime:/etc/localtime:ro \
 
 
+
+
+
+### podman static
+
+
+```bash
+FROM docker.io/library/golang:1.17-buster as build
+ARG DEBIAN_FRONTEND="noninteractive"
+RUN apt-get update \
+        && apt-get install -y seccomp libseccomp-dev \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workdir
+ADD https://github.com/containers/podman/archive/refs/heads/main.tar.gz src.tar.gz
+RUN tar --strip-components=1 -xf src.tar.gz
+ARG BUILD_TAGS="osusergo,netgo,exclude_graphdriver_devicemapper,exclude_graphdriver_btrfs,containers_image_openpgp,seccomp"
+# NOTE watch the project Makefile closely for changes
+RUN go build -o /usr/local/bin/podman \
+        -ldflags "-w -s -extldflags=-static -X github.com/containers/podman/v4/libpod/define.buildInfo=$(date +%s)" \
+        -tags "${BUILD_TAGS}" \
+        ./cmd/podman
+RUN test -x /usr/local/bin/podman && ! ldd /usr/local/bin/podman
+
+FROM docker.io/library/alpine:latest
+COPY --from=build /usr/local/bin/podman /usr/local/bin/podman
+```
+
+
+
+```bash
+podman run --privileged=true -it --rm localhost/alpine-podman-static:latest
+```
+
+```bash
+apk add --no-cache conmon crun fuse-overlayfs cni-plugins iptables ip6tables
+```
+
+
+```bash
+mkdir -p ~/.config/containers
+cat << 'EOF' >> ~/.config/containers/policy.json
+{
+    "default": [
+        {
+            "type": "insecureAcceptAnything"
+        }
+    ],
+    "transports":
+        {
+            "docker-daemon":
+                {
+                    "": [{"type":"insecureAcceptAnything"}]
+                }
+       }
+}
+EOF
+
+mkdir -p ~/.config/containers
+cat << 'EOF' >> ~/.config/containers/registries.conf
+[registries.search]
+registries = ['docker.io']
+[registries.block]
+registries = []
+EOF
+```
+
+```bash
+podman \
+run \
+--log-level=error \
+--interactive=true \
+--tty=true \
+docker.io/library/alpine:3.14.0 \
+sh \
+-c \
+'apk add --no-cache curl'
+```
+
+
+```bash
+podman \
+run \
+--log-level=error \
+--interactive=true \
+--tty=true \
+docker.io/library/ubuntu:22.04 \
+sh \
+-c \
+'apt-get update -y && apt-get install -y nix-bin && nix --version'
+```
+
+
+```bash
+mkdir -p ~/.config/nix \
+&& echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+
+export PATH=~/.nix-profile/bin:$PATH
+
+
+du -h /usr/local/bin/podman && ! ldd /usr/local/bin/podman
+```
+
+
+```bash
+podman \
+run \
+--interactive=true \
+--privileged=false \
+--tty=true \
+--rm=true \
+--user=podman \
+--device=/dev/fuse \
+quay.io/podman/stable \
+    podman \
+    --version
+```
