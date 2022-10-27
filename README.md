@@ -999,7 +999,8 @@ RUN test -x /usr/local/bin/podman && ! ldd /usr/local/bin/podman
 FROM docker.io/library/alpine:latest
 COPY --from=build /usr/local/bin/podman /usr/local/bin/podman
 ```
-
+Refs.:
+- https://github.com/containers/podman/issues/14454#issuecomment-1148561820
 
 
 ```bash
