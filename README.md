@@ -1090,3 +1090,79 @@ quay.io/podman/stable \
     podman \
     --version
 ```
+
+
+### 
+
+```bash
+FROM ubuntu:22.04
+
+RUN apt-get update -y \
+ && apt-get install --no-install-recommends --no-install-suggests -y \
+     ca-certificates \    
+     curl \              
+     file \      
+ && apt-get -y autoremove \
+ && apt-get -y clean \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN addgroup abcgroup --gid 4455  \
+ && adduser -q \
+     --gecos '"An unprivileged user with an group"' \
+     --disabled-password \
+     --ingroup abcgroup \
+     --uid 3322 \
+     abcuser
+
+# The /nix is ignored by nix profile even if it is created
+# RUN mkdir /nix && chmod 0777 /nix && chown -v abcuser: /nix
+
+USER abcuser
+WORKDIR /home/abcuser
+ENV USER="abcuser"
+ENV PATH=/home/abcuser/.nix-profile/bin:/home/abcuser/.local/bin:"$PATH"
+
+# Not DRY, I know
+RUN mkdir -pv $HOME/.local/bin \
+ && export PATH=/home/abcuser/.local/bin:"$PATH" \
+ && curl -L https://hydra.nixos.org/build/188965270/download/2/nix > nix \
+ && mv nix /home/abcuser/.local/bin \
+ && chmod +x /home/abcuser/.local/bin/nix \
+ && mkdir -p ~/.config/nix \
+ && echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+
+EOF
+
+
+podman \
+build \
+--file=Containerfile \
+--tag=unprivileged-ubuntu22 .
+```
+
+
+
+
+```bash
+podman \
+run \
+--annotation=run.oci.keep_original_groups=1 \
+--device=/dev/fuse:rw \
+--device=/dev/kvm:rw \
+--env="DISPLAY=${DISPLAY:-:0.0}" \
+--env="HOME=${HOME:-:/home/someuser}" \
+--env="PATH=/bin:$HOME/.nix-profile/bin" \
+--env="TMPDIR=${HOME}" \
+--env="USER=${USER:-:someuser}" \
+--group-add=keep-groups \
+--hostname=container-nix \
+--interactive=true \
+--name=conteiner-unprivileged-nix \
+--privileged=true \
+--tty=true \
+--userns=keep-id \
+--rm=true \
+--volume="$(pwd)"/"$SHARED_DIRETORY_NAME":"$HOME":U \
+--workdir="$HOME" \
+localhost/snix:2.13.0pre20221223_14f7dae
+```
