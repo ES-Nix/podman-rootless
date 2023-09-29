@@ -978,6 +978,35 @@ TODO:
 
 
 ```bash
+cat << 'EOF' >> ~/.config/containers/containers.conf
+[ENGINE]
+helper_binaries_dir=["/home/nixuser/.nix-profile/bin"]
+EOF
+```
+
+```bash
+tar -xvz -C /tmp/ -f <(wget -O - https://github.com/containers/podman/releases/download/v4.6.2/podman-remote-static-linux_amd64.tar.gz) \
+&& cp -av /tmp/bin/podman-remote-static-linux_amd64 "$HOME"/.local/bin/podman-remote-static \
+&& ln -fsv "$HOME"/.local/bin/podman-remote-static "$HOME"/.local/bin/podman \
+&& podman --version
+```
+Refs.:
+- https://unix.stackexchange.com/a/667337
+
+
+```bash
+tar -xvz -C /tmp/ -f <(wget -O - https://github.com/containers/podman/releases/download/v4.3.1/podman-remote-static.tar.gz) \
+&& cp -av /tmp/podman-remote-static "$HOME"/.local/bin/podman-remote-static \
+&& ln -fsv "$HOME"/.local/bin/podman-remote-static "$HOME"/.local/bin/podman \
+&& podman --version
+```
+
+```bash
+rm -fv "$HOME"/.local/bin/podman-remote-static "$HOME"/.local/bin/podman
+```
+
+```bash
+cat << 'EOF' > Containerfile
 FROM docker.io/library/golang:1.17-buster as build
 ARG DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update \
@@ -986,7 +1015,8 @@ RUN apt-get update \
         && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workdir
-ADD https://github.com/containers/podman/archive/refs/heads/main.tar.gz src.tar.gz
+# ADD https://github.com/containers/podman/archive/refs/heads/main.tar.gz src.tar.gz
+ADD https://github.com/containers/podman/archive/refs/tags/v4.2.0.tar.gz src.tar.gz
 RUN tar --strip-components=1 -xf src.tar.gz
 ARG BUILD_TAGS="osusergo,netgo,exclude_graphdriver_devicemapper,exclude_graphdriver_btrfs,containers_image_openpgp,seccomp"
 # NOTE watch the project Makefile closely for changes
@@ -998,6 +1028,9 @@ RUN test -x /usr/local/bin/podman && ! ldd /usr/local/bin/podman
 
 FROM docker.io/library/alpine:latest
 COPY --from=build /usr/local/bin/podman /usr/local/bin/podman
+EOF
+
+podman build --tag alpine-podman-static . 
 ```
 Refs.:
 - https://github.com/containers/podman/issues/14454#issuecomment-1148561820
